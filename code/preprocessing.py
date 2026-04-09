@@ -7,6 +7,9 @@ import IPython.display as ipd
 # %matplotlib inline
 import matplotlib.pyplot as plt
 import librosa.display
+import sys
+from upload import upload_file_to_google_drive
+from pathlib import Path
 
 # %%
 print(os.listdir('..'))
@@ -37,6 +40,33 @@ def booster(audio):
         return audio
 
 # %%
+# Test typow danych
+test_filename = ftest[0]
+
+before, after = test_filename.rsplit('/', 1)
+path = base_path + '/' + before + '/' + before + '/' + after
+x , sr = librosa.load(path)
+x = booster(x)
+
+mfccs = librosa.feature.mfcc(y=x, sr=sr, n_mfcc=10)
+
+mel = librosa.feature.melspectrogram(y=x, sr=sr, n_mels=128)
+mel_db = librosa.power_to_db(mel, ref=np.max)
+
+print("Typ librosa.feature.mfcc: "+str(type(mfccs)))
+print("Typ librosa.feature.melspectrogram: "+str(type(mel)))
+print("Typ librosa.power_to_db: "+str(type(mel_db)))
+
+display = librosa.display.specshow(mel_db, sr=sr, x_axis='time')
+print("Typ librosa.display.specshow: "+str(type(display)))
+
+print("Rozmiar mel_db: ")
+print(mel_db.shape)
+
+with np.printoptions(threshold=sys.maxsize):
+    print(mel_db)
+
+# %%
 for filename in ftest:
     before, after = filename.rsplit('/', 1)
     path = base_path + '/' + before + '/' + before + '/' + after
@@ -59,25 +89,14 @@ for filename in ftest:
     plt.close()
 
 # %%
+sciezka = Path(base_output)
+
+max_files = sum(1 for f in sciezka.rglob("*") if f.is_file())
+
+print(f"Uploaduje {max_files} plikow...")
+print("Postep: ")
+upload_file_to_google_drive()
+
+# %%
 pd.set_option('display.max_rows', 100)
 ftest.head(100)
-
-# %%
-X = librosa.stft(x)
-Xdb = librosa.amplitude_to_db(abs(X))
-plt.figure(figsize=(14, 5))
-librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='hz')
-plt.colorbar()
-
-# %%
-librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='log')
-plt.colorbar()
-
-# %%
-df = pd.DataFrame(mfccs)
-df.to_csv('/kaggle/working/mfccs.csv', index=False)
-
-# %%
-print('Dane do CNN')
-
-# %%
