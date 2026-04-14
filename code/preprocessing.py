@@ -2,30 +2,32 @@
 import numpy as np
 import pandas as pd
 import os
+import subprocess
 import librosa
 import IPython.display as ipd
 # %matplotlib inline
 import matplotlib.pyplot as plt
 import librosa.display
 import sys
-from upload import upload_file_to_google_drive
 from pathlib import Path
 
 # %%
 print(os.listdir('..'))
 
 # %%
-filenames = pd.read_csv('../common-voice.csv', sep=',')['filename']
+common_voice = pd.read_csv('../common-voice.csv', sep=',')
+print(common_voice.head(10))
+filenames = common_voice['filename']
 filenames
 
 # %%
-# Nie odpalać chuzia na józia bo to zajmuje dłuuugo i pije pamięć RAM jak żul tanie wino
 base_path = '../common-voice'
-base_output = '../spectograms'
+mfccs_output = '../dataset/mfcc'
+spects_output = '../dataset/mel'
 
 mel_coef = pd.DataFrame()
 
-ftest = filenames.iloc[:100]
+ftest = filenames.iloc[:10]
 ftest
 
 # %%
@@ -73,29 +75,53 @@ for filename in ftest:
     x , sr = librosa.load(path)
     x = booster(x)
 
-    #mfccs = librosa.feature.mfcc(y=x, sr=sr, n_mfcc=10)
-
+    # MFCC:
+    mfcc = librosa.feature.mfcc(y=x, sr=sr, n_mfcc=10)
+    mfcc_file = os.path.join(mfccs_output, after.replace('.mp3', '.npy'))
+    np.save(mfcc_file, mfcc)
+    
+    # MEL SPECTOGRAMS:
     mel = librosa.feature.melspectrogram(y=x, sr=sr, n_mels=128)
     mel_db = librosa.power_to_db(mel, ref=np.max)
 
-    out_file = os.path.join(base_output, after.replace('.mp3', '.png'))
+    spec_file = os.path.join(spects_output, after.replace('.mp3', '.png'))
 
     plt.figure(figsize=(15, 7))
     librosa.display.specshow(mel_db, sr=sr, x_axis='time')
 
     plt.axis('off')
     plt.tight_layout()
-    plt.savefig(out_file, bbox_inches='tight', pad_inches=0)
+    plt.savefig(spec_file, bbox_inches='tight', pad_inches=0)
     plt.close()
 
 # %%
-sciezka = Path(base_output)
+npy_file = np.load(f"{mfccs_output}/sample-000004.npy")
+print(npy_file)
 
-max_files = sum(1 for f in sciezka.rglob("*") if f.is_file())
+# %%
+# Dataset Index
+for i, row in common_voice.iterrows():
+    assert os.path.exists(row["mfcc_path"])
+    assert os.path.exists(row["mel_path"])
 
-print(f"Uploaduje {max_files} plikow...")
-print("Postep: ")
-upload_file_to_google_drive()
+# %%
+RCLONE_PATH = r"D:\Programy [Studia]\rclone\rclone.exe"
+local_path = "D:\Projekt magisterski\dataset"
+remote_disk = "gdrive"
+remote_path = "Projekt magisterski/dataset"
+
+# %%
+def upload_folder_to_gdrive(local_folder, remote_disk, remote_path):
+    subprocess.run([
+        RCLONE_PATH,
+        "copy",
+        local_folder,
+        f"{remote_disk}:{remote_path}",
+        "--transfers=8",
+        "--checkers=16"
+    ])
+
+upload_folder_to_gdrive(local_path, remote_disk, remote_path)
 
 # %%
 pd.set_option('display.max_rows', 100)

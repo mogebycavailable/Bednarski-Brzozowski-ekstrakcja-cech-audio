@@ -1,4 +1,6 @@
 # Dir
+__pycache__/
+*.pyc
 common-voice
-spectograms
+dataset
 data.zip
