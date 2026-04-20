@@ -1,25 +1,18 @@
-# %%
 import pandas as pd
-import os
 
-df = pd.read_csv("../common-voice.csv")
+def assemble_record(filename, mfcc_path, mel_path, meta_row):
+    return (
+        filename,
+        meta_row["age"],
+        meta_row["gender"],
+        meta_row["accent"],
+        mfcc_path,
+        mel_path
+    )
 
-mfcc_dir = "../dataset/mfcc"
-mel_dir = "../dataset/mel"
-
-mfcc_paths = []
-mel_paths = []
-
-for filename in df["filename"]:
-    base = os.path.splitext(filename)[0]   # usuwa .mp3
-
-    mfcc_paths.append(os.path.join(mfcc_dir, base + ".npy"))
-    mel_paths.append(os.path.join(mel_dir, base + ".png"))
-
-df["mfcc_path"] = mfcc_paths
-df["mel_path"] = mel_paths
-
-df.to_csv("../dataset/dataset_index.csv", index=False)
-
-print("DONE -> dataset_index.csv")
-# %%
+'''
+filename: cv-valid-dev/sample-000030.mp3
+mfcc_file: ../dataset/mfcc\sample-000030.npy
+spec_file: ../dataset/mel\sample-000030.png
+dataset_assembly is working...
+'''
