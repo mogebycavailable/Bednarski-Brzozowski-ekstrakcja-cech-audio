@@ -16,16 +16,25 @@ ftest
 ### Generate mel spectograms and mfcc set
 # %%
 base_path = '../common-voice'
-mfccs_output = '../dataset/mfcc'
-spects_output = '../dataset/mel'
+mfcc_num_output = '../dataset/mfcc_num'
+mfcc_spec_output = '../dataset/mfcc_spec'
+mel_num_output = '../dataset/mel_num'
+mel_spec_output = '../dataset/mel_spec'
+
+# %%
+preprocess_dataset(ftest, 
+                   base_path, 
+                   mfcc_num_output, 
+                   mfcc_spec_output, 
+                   mel_num_output, 
+                   mel_spec_output)
 
 # %%
 #test_datatypes(ftest, base_path)
-show_mfcc_output(mfccs_output, '000013')
-show_mel_spec_output(spects_output, '000005')
-
-# %%
-preprocess_dataset(ftest, base_path, mfccs_output, spects_output)
+show_num_output(mfcc_num_output, '000004')
+show_spec_output(mfcc_spec_output)
+show_num_output(mel_num_output)
+show_spec_output(mel_spec_output, '000004')
 
 ###
 

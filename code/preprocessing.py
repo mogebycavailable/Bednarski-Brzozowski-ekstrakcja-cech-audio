@@ -14,7 +14,22 @@ from assembly import assemble_record
 dataset = pd.read_csv('../common-voice.csv', sep=',').set_index('filename')
 records = []
 
-def preprocess_dataset(df, base_path, mfccs_output, spects_output):
+MEL_WIDTH = 512
+MEL_HEIGHT = 256
+
+MFCC_WIDTH = 256
+MFCC_HEIGHT = 128
+
+N_MELS = 256
+N_MFCC = 20
+
+DPI=128
+
+def preprocess_dataset(df, base_path, mfcc_num_output, mfcc_spec_output, mel_num_output, mel_spec_output):
+    mel_figsize = (MEL_WIDTH/DPI, MEL_HEIGHT/DPI)
+    mfcc_figsize = (MFCC_WIDTH/DPI, MFCC_HEIGHT/DPI)
+    size = df.shape[0]
+    iterator = 0
     for filename in df:
         if filename not in dataset.index:
             continue
@@ -23,45 +38,62 @@ def preprocess_dataset(df, base_path, mfccs_output, spects_output):
 
         before, after = filename.rsplit('/', 1)
         path = base_path + '/' + before + '/' + before + '/' + after
-        x , sr = librosa.load(path)
+        x , sr = librosa.load(path, sr=48000)
         x = booster(x)
 
-        # MFCC:
-        mfcc = librosa.feature.mfcc(y=x, sr=sr, n_mfcc=10)
-        #mfcc_path = os.path.join(mfccs_output, after.replace('.mp3', '.npy'))
-        mfcc_path = Path(mfccs_output) / (Path(after).stem + ".npy")
-        np.save(mfcc_path, mfcc)
-        
-        # MEL SPECTOGRAMS:
-        mel = librosa.feature.melspectrogram(y=x, sr=sr, n_mels=128)
+        # MFCC numeric:
+        mfcc = librosa.feature.mfcc(y=x, sr=sr, n_mfcc=N_MFCC)
+        mfcc_num_path = Path(mfcc_num_output) / (Path(after).stem + ".npy")
+        np.save(mfcc_num_path, mfcc)
+
+        # MFCC spectograms:
+        mfcc_spec_path = Path(mfcc_spec_output) / (Path(after).stem + ".png")
+        fig = plt.figure(figsize=mfcc_figsize, dpi=DPI)
+        ax = fig.add_axes([0, 0, 1, 1])
+        librosa.display.specshow(mfcc, sr=sr)
+        ax.set_axis_off()
+        plt.savefig(mfcc_spec_path, pad_inches=0, dpi=DPI)
+        plt.close()
+
+        # MEL numeric:
+        mel = librosa.feature.melspectrogram(y=x, sr=sr, n_mels=N_MELS)
         mel_db = librosa.power_to_db(mel, ref=np.max)
+        mel_num_path = Path(mel_num_output) / (Path(after).stem + ".npy")
+        np.save(mel_num_path, mel_db)
 
-        #mel_path = os.path.join(spects_output, after.replace('.mp3', '.png'))
-        mel_path = Path(spects_output) / (Path(after).stem + ".png")
+        # MEL spectograms:
+        mel_spec_path = Path(mel_spec_output) / (Path(after).stem + ".png")
 
-        plt.figure(figsize=(15, 7))
-        librosa.display.specshow(mel_db, sr=sr, x_axis='time')
-
-        plt.axis('off')
-        plt.tight_layout()
-        plt.savefig(mel_path, bbox_inches='tight', pad_inches=0)
+        fig = plt.figure(figsize=mel_figsize, dpi=DPI)
+        ax = fig.add_axes([0, 0, 1, 1])
+        librosa.display.specshow(mel_db, sr=sr, x_axis='time', y_axis='m')
+        ax.set_axis_off()
+        plt.savefig(mel_spec_path, pad_inches=0, dpi=DPI)
         plt.close()
         
         # Assembling
         records.append(assemble_record(
             filename,
-            str(mfcc_path),
-            str(mel_path),
+            str(mfcc_num_path),
+            str(mfcc_spec_path),
+            str(mel_num_path),
+            str(mel_spec_path),
             meta_row
         ))
+
+        iterator+=1
+        if(iterator%100==0):
+            print("Gotowe "+str(iterator*100/float(size))+"%")
     
     final_df = pd.DataFrame(records, columns=[
         "filename",
         "age",
         "gender",
         "accent",
-        "mfcc_path",
-        "mel_path"
+        "mfcc_num_path",
+        "mfcc_spec_path",
+        "mel_num_path",
+        "mel_spec_path"
     ])
     final_df.to_csv("../dataset/dataset_index.csv", index=False)
 
@@ -76,7 +108,7 @@ def test_datatypes(df, base_path):
 
     mfccs = librosa.feature.mfcc(y=x, sr=sr, n_mfcc=10)
 
-    mel = librosa.feature.melspectrogram(y=x, sr=sr, n_mels=128)
+    mel = librosa.feature.melspectrogram(y=x, sr=sr, n_mels=256)
     mel_db = librosa.power_to_db(mel, ref=np.max)
 
     print("Typ librosa.feature.mfcc: "+str(type(mfccs)))
@@ -92,12 +124,12 @@ def test_datatypes(df, base_path):
     with np.printoptions(threshold=sys.maxsize):
         print(mel_db)
 
-def show_mfcc_output(path, id='000004'):
+def show_num_output(path, id='000004'):
     try:
         npy_file = np.load(f"{path}/sample-{id}.npy")
         print(npy_file)
-
-        plt.figure(figsize=(15, 7))
+        
+        plt.figure(figsize=(10, 4))
         librosa.display.specshow(npy_file, x_axis='time')
         plt.colorbar()
         plt.title('MFCC Spectrogram')
@@ -107,7 +139,7 @@ def show_mfcc_output(path, id='000004'):
     except FileNotFoundError:
         print("File not found:", path)
 
-def show_mel_spec_output(path, id='000004'):
+def show_spec_output(path, id='000004'):
     try:
         display(Image(f"{path}/sample-{id}.png"))
     except FileNotFoundError:
