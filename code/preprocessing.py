@@ -25,11 +25,16 @@ N_MFCC = 20
 
 DPI=128
 
-def preprocess_dataset(df, base_path, mfcc_num_output, mfcc_spec_output, mel_num_output, mel_spec_output):
+def preprocess_dataset(df, base_path, mfcc_num_output, mfcc_spec_output, mel_num_output, mel_spec_output, is_grayscale=False):
+    duplicate_counter = 0
+
     mel_figsize = (MEL_WIDTH/DPI, MEL_HEIGHT/DPI)
     mfcc_figsize = (MFCC_WIDTH/DPI, MFCC_HEIGHT/DPI)
     size = df.shape[0]
     iterator = 0
+
+    dictionary = {}
+
     for filename in df:
         if filename not in dataset.index:
             continue
@@ -38,8 +43,18 @@ def preprocess_dataset(df, base_path, mfcc_num_output, mfcc_spec_output, mel_num
 
         before, after = filename.rsplit('/', 1)
         path = base_path + '/' + before + '/' + before + '/' + after
+
         x , sr = librosa.load(path, sr=48000)
         x = booster(x)
+
+        if(after in dictionary):
+            dictionary[after] +=1
+            duplicate_counter+=1
+            before_dot, after_dot = after.rsplit('.',1)
+            before_dot += f"-{dictionary[after]}"
+            after = before_dot +"."+ after_dot
+        else:
+            dictionary[after] = 0
 
         # MFCC numeric:
         mfcc = librosa.feature.mfcc(y=x, sr=sr, n_mfcc=N_MFCC)
@@ -50,10 +65,14 @@ def preprocess_dataset(df, base_path, mfcc_num_output, mfcc_spec_output, mel_num
         mfcc_spec_path = Path(mfcc_spec_output) / (Path(after).stem + ".png")
         fig = plt.figure(figsize=mfcc_figsize, dpi=DPI)
         ax = fig.add_axes([0, 0, 1, 1])
-        librosa.display.specshow(mfcc, sr=sr)
+        if(is_grayscale):
+            librosa.display.specshow(mfcc, sr=sr, cmap="gray")
+        else:
+            librosa.display.specshow(mfcc, sr=sr)
         ax.set_axis_off()
         plt.savefig(mfcc_spec_path, pad_inches=0, dpi=DPI)
         plt.close()
+
 
         # MEL numeric:
         mel = librosa.feature.melspectrogram(y=x, sr=sr, n_mels=N_MELS)
@@ -66,7 +85,10 @@ def preprocess_dataset(df, base_path, mfcc_num_output, mfcc_spec_output, mel_num
 
         fig = plt.figure(figsize=mel_figsize, dpi=DPI)
         ax = fig.add_axes([0, 0, 1, 1])
-        librosa.display.specshow(mel_db, sr=sr, x_axis='time', y_axis='m')
+        if(is_grayscale):
+            librosa.display.specshow(mel_db, sr=sr, x_axis='time', y_axis='m', cmap="gray")
+        else:
+            librosa.display.specshow(mel_db, sr=sr, x_axis='time', y_axis='m')
         ax.set_axis_off()
         plt.savefig(mel_spec_path, pad_inches=0, dpi=DPI)
         plt.close()
@@ -96,6 +118,8 @@ def preprocess_dataset(df, base_path, mfcc_num_output, mfcc_spec_output, mel_num
         "mel_spec_path"
     ])
     final_df.to_csv("../dataset/dataset_index.csv", index=False)
+
+    print(f"Uratowano {duplicate_counter} duplikatow nazw.")
 
 ### Additional functions
 def test_datatypes(df, base_path):
@@ -128,6 +152,7 @@ def show_num_output(path, id='000004'):
     try:
         npy_file = np.load(f"{path}/sample-{id}.npy")
         print(npy_file)
+        print(npy_file.shape)
         
         plt.figure(figsize=(10, 4))
         librosa.display.specshow(npy_file, x_axis='time')
