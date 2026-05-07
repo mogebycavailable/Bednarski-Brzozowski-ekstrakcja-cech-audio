@@ -24,6 +24,7 @@ mel_num_output = '../dataset/mel_num'
 mel_spec_output = '../dataset/mel_spec'
 
 # %%
+'''
 sampling_rates = []
 num_rows = len(filenames)
 
@@ -55,16 +56,33 @@ for i in range(rows):
         used_names.append(after)
 
 print("Wykryto "+str(name_duplicates)+" duplikatow nazw.")
-
+'''
 
 # %%
-preprocess_dataset(filenames, 
+rows = common_voice.shape[0]
+process_start_range = 0
+num_processes = rows/1000
+ctr = 0
+dictionary = {}
+
+while(process_start_range<rows):
+    process_stop_range = process_start_range + 1000
+    if(process_stop_range >= rows):
+        process_stop_range = rows - 1
+    dictionary = preprocess_dataset(filenames, 
                    base_path, 
                    mfcc_num_output, 
                    mfcc_spec_output, 
                    mel_num_output, 
                    mel_spec_output,
+                   process_start_range,
+                   process_stop_range,
+                   dictionary, 
                    True)
+    ctr+=1
+    print(f"Wykonano {ctr}/{num_processes} procesow.")
+    process_start_range+=1000
+
 
 # %%
 #test_datatypes(ftest, base_path)

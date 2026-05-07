@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import librosa.display
 import sys
 from pathlib import Path
+import gc
+import psutil
 
 from audio_booster import booster
 from assembly import assemble_record
@@ -25,7 +27,7 @@ N_MFCC = 20
 
 DPI=128
 
-def preprocess_dataset(df, base_path, mfcc_num_output, mfcc_spec_output, mel_num_output, mel_spec_output, is_grayscale=False):
+def preprocess_dataset(df, base_path, mfcc_num_output, mfcc_spec_output, mel_num_output, mel_spec_output, start, stop, dictionary, is_grayscale=False):
     duplicate_counter = 0
 
     mel_figsize = (MEL_WIDTH/DPI, MEL_HEIGHT/DPI)
@@ -33,9 +35,7 @@ def preprocess_dataset(df, base_path, mfcc_num_output, mfcc_spec_output, mel_num
     size = df.shape[0]
     iterator = 0
 
-    dictionary = {}
-
-    for filename in df:
+    for filename in df.iloc[start:stop]:
         if filename not in dataset.index:
             continue
 
@@ -106,6 +106,10 @@ def preprocess_dataset(df, base_path, mfcc_num_output, mfcc_spec_output, mel_num
         iterator+=1
         if(iterator%100==0):
             print("Gotowe "+str(iterator*100/float(size))+"%")
+            print(f"Aktualne zużycie pamięci RAM: {psutil.Process().memory_info().rss / 1024**2}")
+
+        del x, mfcc, mel
+        gc.collect()
     
     final_df = pd.DataFrame(records, columns=[
         "filename",
@@ -120,6 +124,8 @@ def preprocess_dataset(df, base_path, mfcc_num_output, mfcc_spec_output, mel_num
     final_df.to_csv("../dataset/dataset_index.csv", index=False)
 
     print(f"Uratowano {duplicate_counter} duplikatow nazw.")
+
+    return dictionary
 
 ### Additional functions
 def test_datatypes(df, base_path):
