@@ -31,4 +31,4 @@ print("\nEtykiety akcentu (accent):")
 for i,cls in enumerate(le_accent.classes_):
     print(f"\t{cls} -> {i}")
 
-dataset.to_csv("../dataset/dataset_index_encoded.csv")
+dataset.to_csv("../dataset/dataset_index_encoded.csv", index=False)

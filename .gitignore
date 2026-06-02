@@ -6,6 +6,9 @@ dataset/mel_num
 dataset/mel_spec
 dataset/mfcc_num
 dataset/mfcc_spec
+dataset/mfcc_num_eq
+dataset/mel_num_eq
 data.zip
 dataset.zip
 .venv
+check-sample.mp3
