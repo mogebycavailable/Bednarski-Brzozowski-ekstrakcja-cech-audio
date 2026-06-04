@@ -12,3 +12,6 @@ data.zip
 dataset.zip
 .venv
 check-sample.mp3
+
+code/scalers/
+code/weights/
