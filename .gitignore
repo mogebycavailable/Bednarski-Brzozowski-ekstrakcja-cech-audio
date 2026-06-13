@@ -15,3 +15,9 @@ check-sample.mp3
 
 code/scalers/
 code/weights/
+
+dataset_small/mel_spec
+dataset_small/mfcc_spec
+dataset_small/mfcc_num_eq
+dataset_small/mel_num_eq
+dataset_small.zip

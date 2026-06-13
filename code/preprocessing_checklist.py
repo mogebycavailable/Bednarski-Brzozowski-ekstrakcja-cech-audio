@@ -11,8 +11,9 @@ print(tf.__version__)
 # %%
 
 df = pd.read_csv("../dataset/dataset_index_encoded.csv")
-'''
+
 # %%
+'''
 shapes_1 = []
 
 data_size = df.shape[0]
@@ -114,7 +115,7 @@ def equalize_shape_in_hand(spectrogram, median):
 # %%
 # MFCC and MEL
 
-sample = df.iloc[:1300,:]
+sample = df.iloc[:3000,:]
 
 sample["mfcc_eq_path"] = ""
 sample["mel_eq_path"] = ""
@@ -132,13 +133,13 @@ for i in range(sample.shape[0]):
     pth = sample.loc[i,"mfcc_num_path"]
     mfcc_eq_list.append(equalize_shape(pth, mfcc_ex_pth, 336))
     if i%200 == 0:
-        print(f'{i}/1300')
+        print(f'{i}/3000')
 
 for i in range(sample.shape[0]):
     pth = sample.loc[i,"mel_num_path"]
     mel_eq_list.append(equalize_shape(pth, mel_ex_pth, 336))
     if i%200 == 0:
-        print(f'{i}/1300')
+        print(f'{i}/3000')
 '''
 for i in range(sample.shape[0]):
     sample.loc[i, "mfcc_eq_path"] = equalize_shape(
@@ -147,7 +148,7 @@ for i in range(sample.shape[0]):
         336
     )
     if i%100 == 0:
-        print(f'{i}/1300')
+        print(f'{i}/3000')
 
 for i in range(sample.shape[0]):
     sample.loc[i, "mel_eq_path"] = equalize_shape(
@@ -156,7 +157,7 @@ for i in range(sample.shape[0]):
         336
     )
     if i%100 == 0:
-        print(f'{i}/1300')
+        print(f'{i}/3000')
 
 '''
 for path in mfcc_eq_list:
@@ -168,5 +169,5 @@ for path in mel_eq_list:
     print(hopefully_qualized.shape)
 '''
 
-sample.to_csv("../dataset/dataset_index__encoded_equalized.csv", index=False)
+sample.to_csv("../dataset/dataset_index_encoded_equalized.csv", index=False)
 # %%
