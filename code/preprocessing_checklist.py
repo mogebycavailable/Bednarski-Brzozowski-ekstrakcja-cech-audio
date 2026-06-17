@@ -6,11 +6,11 @@ import tensorflow as tf
 import os
 
 # %%
-print(tf.__version__)
+#print(tf.__version__)
 
 # %%
 
-df = pd.read_csv("../dataset/dataset_index_encoded.csv")
+#df = pd.read_csv("../dataset/dataset_index_encoded.csv")
 
 # %%
 '''
@@ -114,7 +114,7 @@ def equalize_shape_in_hand(spectrogram, median):
 
 # %%
 # MFCC and MEL
-
+'''
 sample = df.iloc[:3000,:]
 
 sample["mfcc_eq_path"] = ""
@@ -128,7 +128,7 @@ os.makedirs(mel_ex_pth, exist_ok=True)
 
 mfcc_eq_list = []
 mel_eq_list = []
-'''
+
 for i in range(sample.shape[0]):
     pth = sample.loc[i,"mfcc_num_path"]
     mfcc_eq_list.append(equalize_shape(pth, mfcc_ex_pth, 336))
@@ -140,7 +140,7 @@ for i in range(sample.shape[0]):
     mel_eq_list.append(equalize_shape(pth, mel_ex_pth, 336))
     if i%200 == 0:
         print(f'{i}/3000')
-'''
+
 for i in range(sample.shape[0]):
     sample.loc[i, "mfcc_eq_path"] = equalize_shape(
         sample.loc[i, "mfcc_num_path"],
@@ -159,7 +159,7 @@ for i in range(sample.shape[0]):
     if i%100 == 0:
         print(f'{i}/3000')
 
-'''
+
 for path in mfcc_eq_list:
     hopefully_qualized = np.load(path)
     print(hopefully_qualized.shape)
@@ -167,7 +167,8 @@ for path in mfcc_eq_list:
 for path in mel_eq_list:
     hopefully_qualized = np.load(path)
     print(hopefully_qualized.shape)
-'''
+
 
 sample.to_csv("../dataset/dataset_index_encoded_equalized.csv", index=False)
 # %%
+'''

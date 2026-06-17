@@ -25,79 +25,30 @@ from sklearn.metrics import (
     confusion_matrix
 )
 
-
-
-
-
 # %%
-# BUDOWA, KOMPILACJA I INFORMACJE O MODELU
-
-mlp_gender_mel_model = Sequential([
-    layer.Input(shape=(256,336)),
-    layer.Flatten(),
-    layer.Dense(512, activation='relu'),
-    layer.Dropout(0.3),
-    layer.Dense(128, activation='relu'),
-    layer.Dropout(0.3),
-    layer.Dense(32, activation='relu'),
-    layer.Dense(1, activation='sigmoid')
-])
-
-mlp_gender_mel_model.compile(
-    optimizer='adam',
-    loss='binary_crossentropy',
-    metrics=[
-        'accuracy',
-        Precision(name='precision')
-    ]
-)
-
-mlp_gender_mel_model.summary()
-
-# %%
-# CALLBACKI
-
-early_stopping = EarlyStopping(
-    monitor='val_loss',
-    patience=10,
-    restore_best_weights=True,
-    verbose=1
-)
-
-checkpoint = ModelCheckpoint(
-    filepath='weights/best_mel_mlp_weights.keras',
-    monitor='val_accuracy',
-    save_best_only=True,
-    mode='max',
-    verbose=1
-)
-
-# %% 
 # WCZYTANIE DANYCH
 
-data = pd.read_csv("../dataset/dataset_index__encoded_equalized.csv")
+data = pd.read_csv("../dataset/dataset_index_encoded_equalized.csv")
 data
 
 # %%
+# PODZIAŁ NA ZMIENNE NIEZALEŻNE I ZALEŻNE
 
 independents = []
 dependent = []
 
+# USUNAC REPLACE!!
 for i in range(data.shape[0]):
-    independents.append(np.load(data.loc[i,"mel_eq_path"]))
+    independents.append(np.load(data.loc[i,"mel_eq_path"].replace("dataset","dataset_small")))
     dependent.append(data.loc[i,"gender"])
 
 X = np.array(independents)
 y = np.array(dependent)
 
-
-
-
 # %%
+# BADANIE ZROWNOWAZENIA ZBIORU DANYCH
+
 print(np.bincount(y.astype(int)))
-
-# %%
-# SKALOWANIE DANYCH
 
 # %%
 # PODZIAŁ ZBIORU
@@ -111,6 +62,7 @@ print("X dtype:", X_train.dtype)
 print("y dtype:", y_train.dtype)
 
 # %%
+# STANDARYZACJA DANYCH DO N(0,1)
 N, H, W = X_train.shape
 
 X_train_flat = X_train.reshape(N, -1)
@@ -125,27 +77,34 @@ X_train = X_train_scaled.reshape(N, H, W)
 X_test  = X_test_scaled.reshape(X_test.shape[0], H, W)
 
 # %%
+# ŁADOWANIE MODELU I CALLBACKOW
+
+import mlp_mel_gender
+
+model = mlp_mel_gender.load_model()
+callbacks = mlp_mel_gender.load_callbacks()
+
+model.summary()
+
+# %%
 # TRENOWANIE MODELU I ZAPIS HISTORII TRENINGU
 
-history = mlp_gender_mel_model.fit(
+history = model.fit(
     X_train,
     y_train,
     validation_split=0.1,
     epochs=100,
     batch_size=32,
-    callbacks=[
-        early_stopping,
-        checkpoint
-    ],
+    callbacks=callbacks,
     verbose=1
 )
 
 # %%
 # WCZYTANIE NAJLEPSZEGO MODELU I PREDYKCJA
 
-best_mlp_mel_model = load_model("weights/best_mel_mlp_weights.keras")
+best_mlp_mfcc_model = load_model("weights/best_mel_mlp_weights.keras")
 
-y_proba = best_mlp_mel_model.predict(X_test)
+y_proba = best_mlp_mfcc_model.predict(X_test)
 y_pred = (y_proba > 0.5).astype(int)
 
 # %%
@@ -183,9 +142,4 @@ plt.title("Macierz pomylek - Perceptron wielowarstwowy dla Mel-spectrogramow")
 
 plt.tight_layout()
 plt.show()
-# %%
-import joblib
-
-joblib.dump(scaler, "scalers/mel_num_scaler.pkl")
-
 # %%
