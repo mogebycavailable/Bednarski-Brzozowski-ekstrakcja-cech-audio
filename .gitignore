@@ -8,8 +8,11 @@ dataset/mfcc_num
 dataset/mfcc_spec
 dataset/mfcc_num_eq
 dataset/mel_num_eq
+dataset/mfcc_num_eq_3000
+dataset/mel_num_eq_3000
 data.zip
 dataset.zip
+dataset/dataset_final.zip
 .venv
 check-sample.mp3
 

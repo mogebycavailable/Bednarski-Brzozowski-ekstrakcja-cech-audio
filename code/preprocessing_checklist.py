@@ -10,7 +10,7 @@ import os
 
 # %%
 
-#df = pd.read_csv("../dataset/dataset_index_encoded.csv")
+df = pd.read_csv("../dataset/dataset_index_encoded.csv")
 
 # %%
 '''
@@ -114,8 +114,9 @@ def equalize_shape_in_hand(spectrogram, median):
 
 # %%
 # MFCC and MEL
-'''
-sample = df.iloc[:3000,:]
+
+#sample = df.iloc[:3000,:]
+sample = df.copy()
 
 sample["mfcc_eq_path"] = ""
 sample["mel_eq_path"] = ""
@@ -126,9 +127,10 @@ mel_ex_pth = "..\dataset\mel_num_eq"
 os.makedirs(mfcc_ex_pth, exist_ok=True)
 os.makedirs(mel_ex_pth, exist_ok=True)
 
-mfcc_eq_list = []
-mel_eq_list = []
-
+#mfcc_eq_list = []
+#mel_eq_list = []
+#
+'''
 for i in range(sample.shape[0]):
     pth = sample.loc[i,"mfcc_num_path"]
     mfcc_eq_list.append(equalize_shape(pth, mfcc_ex_pth, 336))
@@ -140,15 +142,17 @@ for i in range(sample.shape[0]):
     mel_eq_list.append(equalize_shape(pth, mel_ex_pth, 336))
     if i%200 == 0:
         print(f'{i}/3000')
-
+'''
+#
+'''
 for i in range(sample.shape[0]):
     sample.loc[i, "mfcc_eq_path"] = equalize_shape(
         sample.loc[i, "mfcc_num_path"],
         mfcc_ex_pth,
         336
     )
-    if i%100 == 0:
-        print(f'{i}/3000')
+    if i%500 == 0:
+        print(f"MFCC: {i}/{sample.shape[0]}")
 
 for i in range(sample.shape[0]):
     sample.loc[i, "mel_eq_path"] = equalize_shape(
@@ -156,10 +160,31 @@ for i in range(sample.shape[0]):
         mel_ex_pth,
         336
     )
-    if i%100 == 0:
-        print(f'{i}/3000')
+    if i%500 == 0:
+        print(f"MEL: {i}/{sample.shape[0]}")
+'''
+#
+mfcc_paths = []
 
+for i, path in enumerate(sample["mfcc_num_path"]):
+    mfcc_paths.append(equalize_shape(path, mfcc_ex_pth, 336))
 
+    if i % 500 == 0:
+        print(f"MFCC: {i}/{len(sample)}")
+
+sample["mfcc_eq_path"] = mfcc_paths
+
+mel_paths = []
+
+for i, path in enumerate(sample["mel_num_path"]):
+    mel_paths.append(equalize_shape(path, mel_ex_pth, 336))
+
+    if i % 500 == 0:
+        print(f"MEL: {i}/{len(sample)}")
+
+sample["mel_eq_path"] = mel_paths
+#
+'''
 for path in mfcc_eq_list:
     hopefully_qualized = np.load(path)
     print(hopefully_qualized.shape)
@@ -167,8 +192,7 @@ for path in mfcc_eq_list:
 for path in mel_eq_list:
     hopefully_qualized = np.load(path)
     print(hopefully_qualized.shape)
-
+'''
 
 sample.to_csv("../dataset/dataset_index_encoded_equalized.csv", index=False)
 # %%
-'''
