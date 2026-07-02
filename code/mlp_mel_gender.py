@@ -55,3 +55,5 @@ def load_callbacks():
     )
     return [early_stopping, checkpoint]
 
+
+# %%
