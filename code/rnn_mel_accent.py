@@ -9,7 +9,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 # *** USTAWIENIA ***
 #n_timesteps = 336 # -> Liczba kroków czasu
 #n_features = 256 # -> Liczba cech
-#n_outputs = 1 # -> Liczba klas
+#n_outputs = 16 # -> Liczba klas
 
 # %%
 def load_model():
@@ -30,12 +30,7 @@ def load_model():
         optimizer='adam',
         loss='sparse_categorical_crossentropy',
         metrics=[
-            'accuracy',
-            AUC(
-                name="roc_auc",
-                curve="ROC",
-                from_logits=False
-            )
+            'accuracy'
         ]
     )
 
@@ -48,7 +43,7 @@ def load_callbacks():
     verbose=1
     )
     checkpoint = ModelCheckpoint(
-        filepath='weights/best_rnn_mel_accent_model.keras',
+        filepath='weights/best_mel_rnn_accent_model.keras',
         monitor='val_loss',
         save_best_only=True,
         mode='min',

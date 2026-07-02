@@ -21,80 +21,136 @@ from sklearn.metrics import (
     f1_score,
     confusion_matrix
 )
+import tensorflow as tf
+from keras.layers import Normalization
 
 # %%
 # WCZYTANIE DANYCH
 
-data = pd.read_csv("../dataset/dataset_index_encoded_equalized.csv")
+df = pd.read_csv("../dataset/dataset_index_encoded_equalized.csv")
+df = df.iloc[:6000,:]
+df
+
+# %%
+# PRZEJSCIE NA TYP NUMPY.NDARRAY
+data = df[["mel_eq_path", "accent"]].to_numpy()
 data
 
 # %%
-# PODZIAŁ NA ZMIENNE NIEZALEŻNE I ZALEŻNE
-
-independents = []
-dependent = []
-
-for i in range(data.shape[0]):
-    independents.append(np.load(data.loc[i,"mfcc_eq_path"].replace("dataset","dataset_small")))
-    dependent.append(int(data.loc[i,"gender"]))
-
-X = np.array(independents)
-X = np.transpose(X, (0, 2, 1))
-y = np.array(dependent)
-
-print("X.shape = "+str(X.shape))
-print("y.shape = "+str(y.shape))
+# BADANIE ZROWNOWAZENIA ZBIORU
+print(np.bincount(data[:,1].astype(int)))
 
 # %%
-# BADANIE ZROWNOWAZENIA ZBIORU DANYCH
+# PODZIAŁ NA ZBIÓR TRENINGOWY, TESTOWY I WALIDACYJNY
 
-print(np.bincount(y.astype(int)))
+X = data[:,0]
+y = data[:,1].astype(np.int32)
 
-# %%
-# PODZIAŁ ZBIORU
-
-X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.15, stratify=y, random_state=42)
-
-print("X_train shape:", X_train.shape)
-print("y_train shape:", y_train.shape)
-
-print("X dtype:", X_train.dtype)
-print("y dtype:", y_train.dtype)
+X_train, X_temp, y_train, y_temp = train_test_split(
+    X,
+    y,
+    test_size=0.25,
+    random_state=42,
+    stratify=y
+)
 
 # %%
 
+X_val, X_test, y_val, y_test = train_test_split(
+    X_temp,
+    y_temp,
+    test_size=0.60,
+    random_state=42,
+    stratify=y_temp
+)
+
+print(X_train.shape)
+print(X_val.shape)
+print(X_test.shape)
+
+# %%
+# WERYFIKACJA TYPOW DANYCH
+print(type(X_train[0]))
+print(X_train[0])
+
+# %%
 # USTALENIE WAG DLA NIEZRÓWNOWAŻONEGO ZBIORU DANYCH
+classes = np.unique(y_train)
+
 weights = compute_class_weight(
     class_weight='balanced',
-    classes=np.unique(y_train),
+    classes=classes,
     y=y_train
 )
 
-class_weights = dict(enumerate(weights))
+class_weights = dict(zip(classes, weights))
+
+print(np.unique(y_train))
+print(class_weights)
+print(X_train.shape)
 
 # %%
+# PRZEJŚCIE NA TYP DATASET
+def load_numpy(path):
+    file = np.load(path.decode())
+    return file.astype(np.float32)
 
-# STANDARYZACJA DANYCH DO N(0,1)
-N, H, W = X_train.shape
+# DEFINICJA FUNKCJI MAPUJACEJ
+def load(path : str, label):
+    #path = path.replace("dataset","dataset_small")
+    tensor = tf.numpy_function(load_numpy, [path], tf.float32)
+    tensor.set_shape((256, 336))
+    tensor = tf.transpose(tensor)
+    return tensor, label
 
-X_train_flat = X_train.reshape(N, -1)
-X_test_flat  = X_test.reshape(X_test.shape[0], -1)
+# %%
+# TEST FUNKCJI MAPUJACEJ
+'''
+tensor, label = load(X_train[0], y_train[0])
 
-scaler = StandardScaler()
+print(tensor.shape)
+print(label)
+'''
 
-X_train_scaled = scaler.fit_transform(X_train_flat)
-X_test_scaled  = scaler.transform(X_test_flat)
+# %%
+# ŁADOWANIE TENSORÓW RZĘDU DRUGIEGO (MACIERZY/TABLIC) W LOCIE PODCZAS TRENINGU
+train_dataset = (
+    tf.data.Dataset.from_tensor_slices((X_train, y_train))
+    .shuffle(10000)
+    .map(load, num_parallel_calls=tf.data.AUTOTUNE)
+    .batch(64)
+    .prefetch(tf.data.AUTOTUNE)
+)
 
-X_train = X_train_scaled.reshape(N, H, W)
-X_test  = X_test_scaled.reshape(X_test.shape[0], H, W)
+val_dataset = (
+    tf.data.Dataset.from_tensor_slices((X_val, y_val))
+    .map(load, num_parallel_calls=tf.data.AUTOTUNE)
+    .batch(64)
+    .prefetch(tf.data.AUTOTUNE)
+)
+
+test_dataset = (
+    tf.data.Dataset.from_tensor_slices((X_test, y_test))
+    .map(load, num_parallel_calls=tf.data.AUTOTUNE)
+    .batch(64)
+    .prefetch(tf.data.AUTOTUNE)
+)
+
+# %%
+# STANDARYZACJA TF.DATA.DATASET
+normalizer = Normalization(axis=-1)
+normalizer.adapt(train_dataset.map(lambda x, y: x))
+train_dataset = train_dataset.map(lambda x, y: (normalizer(x), y))
+test_dataset = test_dataset.map(lambda x, y: (normalizer(x), y))
+val_dataset = val_dataset.map(lambda x, y: (normalizer(x), y))
 
 # %%
 # ŁADOWANIE MODELU I CALLBACKOW
 
-import rnn_mfcc_gender
+import rnn_mel_accent
 
-model = rnn_mfcc_gender.load_model()
-callbacks = rnn_mfcc_gender.load_callbacks()
+model = rnn_mel_accent.load_model()
+callbacks = rnn_mel_accent.load_callbacks()
 
 model.summary()
 
@@ -102,11 +158,10 @@ model.summary()
 # TRENOWANIE MODELU I ZAPIS HISTORII TRENINGU
 
 history = model.fit(
-    X_train,
-    y_train,
-    validation_split=0.1,
+    train_dataset,
+    validation_data=val_dataset,
     epochs=100,
-    batch_size=32,
+    batch_size=64,
     class_weight=class_weights,
     callbacks=callbacks,
     verbose=1
@@ -115,7 +170,7 @@ history = model.fit(
 # %%
 # WCZYTANIE NAJLEPSZEGO MODELU I PREDYKCJA
 
-best_rnn_model = load_model("weights/best_mfcc_rnn_model.keras")
+best_rnn_model = load_model("weights/best_mel_rnn_accent_model.keras")
 
 y_proba = best_rnn_model.predict(X_test)
 y_pred = (y_proba > 0.5).astype(int)
