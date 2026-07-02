@@ -25,7 +25,8 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
     f1_score,
-    confusion_matrix
+    confusion_matrix,
+    classification_report
 )
 
 # %%
@@ -69,7 +70,7 @@ print("y dtype:", y_train.dtype)
 
 # %%
 
-# STANDARYZACJA DANYCH DO N(0,1)
+# STANDARYZACJA DANYCH
 N, H, W = X_train.shape
 
 X_train_flat = X_train.reshape(N, -1)
@@ -109,21 +110,19 @@ history = model.fit(
 # %%
 # WCZYTANIE NAJLEPSZEGO MODELU I PREDYKCJA
 
-best_mlp_mel_model = load_model("weights/best_mfcc_cnn_model.keras")
+best_mlp_mel_model = load_model("weights/best_mel_mlp_accent_model.keras")
 
-y_proba = best_mlp_mel_model.predict(test_ds)
-y_pred = (y_proba > 0.5).astype(int)
+y_proba = best_mlp_mel_model.predict(X_test)
+y_pred = np.argmax(y_proba,axis=1)
+y_pred
 
 # %%
 # METRYKI
 
-y_test = np.concatenate([
-    y.numpy().reshape(-1)
-    for _, y in test_ds
-])
-
 cm = confusion_matrix(y_test, y_pred)
-
+cr = classification_report(y_test, y_pred)
+print(cr)
+'''
 print("Accuracy :", accuracy_score(y_test, y_pred))
 print("Precision:", precision_score(y_test, y_pred))
 print("Recall   :", recall_score(y_test, y_pred))
@@ -133,6 +132,7 @@ specificity = tn / (tn + fp)
 
 print(f"Specificity: {specificity:.4f}")
 print("F1-score :", f1_score(y_test, y_pred))
+'''
 
 # %%
 # MACIERZ POMYLEK
@@ -144,13 +144,11 @@ sns.heatmap(
     annot=True,
     fmt="d",
     cmap="Blues",
-    xticklabels=["Female", "Male"],
-    yticklabels=["Female", "Male"]
 )
 
 plt.xlabel("Klasa przewidziana")
 plt.ylabel("Klasa prawdziwa")
-plt.title("Macierz pomylek - Sieć konwolucyjna dla MEL-spectrogramow")
+plt.title("Macierz pomylek - Perceptron wielowarstwowy dla MEL-spectrogramow")
 
 plt.tight_layout()
 plt.show()

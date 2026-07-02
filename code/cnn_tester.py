@@ -35,97 +35,105 @@ tf.config.list_physical_devices('GPU')
 # %%
 # WCZYTANIE DANYCH
 
-data = pd.read_csv("../dataset/dataset_index_encoded_equalized.csv")
+df = pd.read_csv("../dataset_small/dataset_index_encoded_equalized.csv")
+df
+
+# %%
+# PRZEJSCIE NA TYP NUMPY.NDARRAY
+data = df[["mel_spec_path", "accent"]].to_numpy()
 data
 
 # %%
-# PODZIAŁ NA ZMIENNE NIEZALEŻNE I ZALEŻNE
+# BADANIE ZROWNOWAZENIA ZBIORU
+print(np.bincount(data[:,1].astype(int)))
 
-independents = []
-dependent = []
+# %%
+# PODZIAŁ NA ZBIÓR TRENINGOWY, TESTOWY I WALIDACYJNY
 
-def load(path):
+X = data[:,0]
+y = data[:,1].astype(np.int32)
+
+X_train, X_temp, y_train, y_temp = train_test_split(
+    X,
+    y,
+    test_size=0.25,
+    random_state=42,
+    stratify=y
+)
+
+# %%
+
+X_val, X_test, y_val, y_test = train_test_split(
+    X_temp,
+    y_temp,
+    test_size=0.60,
+    random_state=42,
+    stratify=y_temp
+)
+
+print(X_train.shape)
+print(X_val.shape)
+print(X_test.shape)
+
+
+# %%
+# WERYFIKACJA TYPOW DANYCH
+print(type(X_train[0]))
+print(X_train[0])
+
+
+# %%
+# PRZEJŚCIE NA TYP DATASET
+
+# DEFINICJA FUNKCJI MAPUJACEJ
+def load(path : str, label):
+    path = path.replace("dataset","dataset_small")
     img = tf.io.read_file(path)
     img = tf.io.decode_png(img, channels=1)
-    #img = tf.image.resize(img, (64, 128))
+    img = tf.image.resize(img, (128, 256))
     img = tf.cast(img, tf.float32) / 255.0
-    return img
-
-# USUNAC REPLACE!!
-for i in range(data.shape[0]):
-    img = load(data.loc[i,"mfcc_spec_path"].replace("dataset","dataset_small"))
-    independents.append(img)
-    dependent.append(data.loc[i,"gender"])
-
-
-X = tf.convert_to_tensor(independents)
-y = tf.convert_to_tensor(dependent)
-
-X.shape
+    return img, label
 
 # %%
-# TRAIN TEST SPLIT W TENSORFLOW
-ds = tf.data.Dataset.from_tensor_slices((X, y))
-BATCH_SIZE = 8
+# TEST FUNKCJI MAPUJACEJ
 
-train_ds, val_ds, test_ds = train_val_test_split(ds, 
-                     train_size=0.75, 
-                     test_size=0.15, 
-                     val_size=0.1, 
-                     stratify=True, 
-                     shuffle=True, 
-                     random_state=42,
-                     )
+img, label = load(X_train[0], y_train[0])
 
-train_ds = train_ds.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
-val_ds = val_ds.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
-test_ds = test_ds.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
-
+print(img.shape)
+print(label)
 
 # %%
-#X[0].shape
+# ŁADOWANIE ZDJĘĆ W LOCIE PODCZAS TRENINGU
+train_dataset = (
+    tf.data.Dataset.from_tensor_slices((X_train, y_train))
+    .shuffle(10000)
+    .map(load, num_parallel_calls=tf.data.AUTOTUNE)
+    .batch(8)
+    .prefetch(tf.data.AUTOTUNE)
+)
 
-# %%
-# BADANIE ZROWNOWAZENIA ZBIORU DANYCH
+val_dataset = (
+    tf.data.Dataset.from_tensor_slices((X_val, y_val))
+    .map(load, num_parallel_calls=tf.data.AUTOTUNE)
+    .batch(8)
+    .prefetch(tf.data.AUTOTUNE)
+)
 
-#print(np.bincount(y.astype(int)))
+test_dataset = (
+    tf.data.Dataset.from_tensor_slices((X_test, y_test))
+    .map(load, num_parallel_calls=tf.data.AUTOTUNE)
+    .batch(8)
+    .prefetch(tf.data.AUTOTUNE)
+)
 
-# %%
-# PODZIAŁ ZBIORU
-'''
-X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.15, stratify=y, random_state=42)
-
-print("X_train shape:", X_train.shape)
-print("y_train shape:", y_train.shape)
-
-print("X dtype:", X_train.dtype)
-print("y dtype:", y_train.dtype)
-'''
-
-# %%
-'''
-# STANDARYZACJA DANYCH DO N(0,1)
-N, H, W = X_train.shape
-
-X_train_flat = X_train.reshape(N, -1)
-X_test_flat  = X_test.reshape(X_test.shape[0], -1)
-
-scaler = StandardScaler()
-
-X_train_scaled = scaler.fit_transform(X_train_flat)
-X_test_scaled  = scaler.transform(X_test_flat)
-
-X_train = X_train_scaled.reshape(N, H, W)
-X_test  = X_test_scaled.reshape(X_test.shape[0], H, W)
-'''
 
 # %%
 # ŁADOWANIE MODELU I CALLBACKOW
 
-import cnn_mfcc_gender
+import cnn_mel_accent
 
-model = cnn_mfcc_gender.load_model()
-callbacks = cnn_mfcc_gender.load_callbacks()
+model = cnn_mel_accent.load_model()
+callbacks = cnn_mel_accent.load_callbacks()
 
 model.summary()
 
@@ -133,8 +141,8 @@ model.summary()
 # TRENOWANIE MODELU I ZAPIS HISTORII TRENINGU
 
 history = model.fit(
-    train_ds,
-    validation_data=val_ds,
+    train_dataset,
+    validation_data=val_dataset,
     epochs=100,
     batch_size=8,
     callbacks=callbacks,
