@@ -28,7 +28,8 @@ from keras.layers import Normalization
 # WCZYTANIE DANYCH
 
 df = pd.read_csv("../dataset/dataset_index_encoded_equalized.csv")
-df = df.iloc[:6000,:]
+#df = df.iloc[:6000,:]
+df = df.sample(n=10000, random_state=42).reset_index(drop=True)
 df
 
 # %%
@@ -75,6 +76,7 @@ print(X_train[0])
 
 # %%
 # USTALENIE WAG DLA NIEZRÓWNOWAŻONEGO ZBIORU DANYCH
+'''
 classes = np.unique(y_train)
 
 weights = compute_class_weight(
@@ -88,11 +90,12 @@ class_weights = dict(zip(classes, weights))
 print(np.unique(y_train))
 print(class_weights)
 print(X_train.shape)
-
+'''
 # %%
 # PRZEJŚCIE NA TYP DATASET
 def load_numpy(path):
     file = np.load(path.decode())
+    #print(file.shape)
     return file.astype(np.float32)
 
 # DEFINICJA FUNKCJI MAPUJACEJ
@@ -144,6 +147,9 @@ train_dataset = train_dataset.map(lambda x, y: (normalizer(x), y))
 test_dataset = test_dataset.map(lambda x, y: (normalizer(x), y))
 val_dataset = val_dataset.map(lambda x, y: (normalizer(x), y))
 
+x, y = next(iter(train_dataset))
+print("X shape:", x.shape)
+print("Y shape:", y)
 # %%
 # ŁADOWANIE MODELU I CALLBACKOW
 
@@ -161,8 +167,8 @@ history = model.fit(
     train_dataset,
     validation_data=val_dataset,
     epochs=100,
-    batch_size=64,
-    class_weight=class_weights,
+    batch_size=16,
+    #class_weight=class_weights,
     callbacks=callbacks,
     verbose=1
 )
@@ -172,23 +178,23 @@ history = model.fit(
 
 best_rnn_model = load_model("weights/best_mel_rnn_accent_model.keras")
 
-y_proba = best_rnn_model.predict(X_test)
-y_pred = (y_proba > 0.5).astype(int)
+y_proba = best_rnn_model.predict(test_dataset)
+y_pred = np.argmax(y_proba, axis=1)
 
 # %%
 # METRYKI
 
 y_test = np.concatenate([
-    y.numpy().reshape(-1)
-    for _, y in y_test
+    y.numpy()
+    for _, y in test_dataset
 ])
 
 # %%
 cm = confusion_matrix(y_test, y_pred)
 
 print("Accuracy :", accuracy_score(y_test, y_pred))
-print("Precision:", precision_score(y_test, y_pred))
-print("Recall   :", recall_score(y_test, y_pred))
+print("Precision:", precision_score(y_test, y_pred, average="macro"))
+print("Recall   :", recall_score(y_test, y_pred, average="macro"))
 
 tn, fp, fn, tp = cm.ravel()
 specificity = tn / (tn + fp)
@@ -198,6 +204,24 @@ print("F1-score :", f1_score(y_test, y_pred))
 
 # %%
 # MACIERZ POMYLEK
+labels = [
+        "african",
+        "australia",
+        "bermuda",
+        "canada",
+        "england",
+        "hongkong",
+        "indian",
+        "ireland",
+        "malaysia",
+        "newzealand",
+        "philippines",
+        "scotland",
+        "singapore",
+        "southatlandtic",
+        "us",
+        "wales",
+]
 
 plt.figure(figsize=(7, 6))
 
@@ -206,13 +230,13 @@ sns.heatmap(
     annot=True,
     fmt="d",
     cmap="Blues",
-    xticklabels=["Female", "Male"],
-    yticklabels=["Female", "Male"]
+    xticklabels=labels,
+    yticklabels=labels
 )
 
 plt.xlabel("Klasa przewidziana")
 plt.ylabel("Klasa prawdziwa")
-plt.title("Macierz pomylek - Sieć rekurencyjna dla współczynników MFCC")
+plt.title("Macierz pomylek - Sieć rekurencyjna dla danych w skali melowej")
 
 plt.tight_layout()
 plt.show()

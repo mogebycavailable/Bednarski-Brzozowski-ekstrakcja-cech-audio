@@ -13,17 +13,60 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 # %%
 def load_model():
+    '''
     rnn_accent_mel_model = Sequential([
         layer.Bidirectional(
-            layer.LSTM(256, return_sequences=True), input_shape=(336, 256)
+            layer.LSTM(128, return_sequences=True), input_shape=(336, 256)
         ),
+        layer.LayerNormalization(),
         layer.Dropout(0.3),
         layer.Bidirectional(
-            layer.LSTM(128)
+            layer.LSTM(64)
         ),
+        layer.LayerNormalization(),
         layer.Dropout(0.3),
         layer.Dense(64, activation='relu'),
         layer.Dense(16, activation='softmax')
+    ])
+
+    rnn_accent_mel_model.compile(
+        optimizer='adam',
+        loss='sparse_categorical_crossentropy',
+        metrics=[
+            'accuracy'
+        ]
+    )
+    '''
+    rnn_accent_mel_model = Sequential([
+        layer.LayerNormalization(input_shape=(336, 256)),
+
+        layer.Bidirectional(
+            layer.LSTM(
+                128,
+                return_sequences=True,
+                dropout=0.2,
+                recurrent_dropout=0.2
+            )
+        ),
+
+        layer.LayerNormalization(),
+        layer.Dropout(0.3),
+
+        layer.Bidirectional(
+            layer.LSTM(
+                64,
+                dropout=0.2,
+                recurrent_dropout=0.2
+            )
+        ),
+        layer.LayerNormalization(),
+        layer.Dropout(0.3),
+
+        layer.Dense(64, activation=None),
+        layer.BatchNormalization(),
+        layer.Activation("relu"),
+        layer.Dropout(0.4),
+        layer.Dense(16, activation="softmax")
     ])
 
     rnn_accent_mel_model.compile(
