@@ -34,7 +34,7 @@ df
 
 # %%
 # PRZEJSCIE NA TYP NUMPY.NDARRAY
-data = df[["mel_eq_path", "accent"]].to_numpy()
+data = df[["mel_eq_path", "age"]].to_numpy()
 data
 
 # %%
@@ -153,10 +153,10 @@ print("Y shape:", y)
 # %%
 # ŁADOWANIE MODELU I CALLBACKOW
 
-import rnn_mel_accent
+import rnn_mel_age
 
-model = rnn_mel_accent.load_model()
-callbacks = rnn_mel_accent.load_callbacks()
+model = rnn_mel_age.load_model()
+callbacks = rnn_mel_age.load_callbacks()
 
 model.summary()
 
@@ -176,7 +176,7 @@ history = model.fit(
 # %%
 # WCZYTANIE NAJLEPSZEGO MODELU I PREDYKCJA
 
-best_rnn_model = load_model("weights/best_mel_rnn_accent_model.keras")
+best_rnn_model = load_model("weights/best_mel_rnn_age_model.keras")
 
 y_proba = best_rnn_model.predict(test_dataset)
 y_pred = np.argmax(y_proba, axis=1)
@@ -196,31 +196,47 @@ print("Accuracy :", accuracy_score(y_test, y_pred))
 print("Precision:", precision_score(y_test, y_pred, average="macro"))
 print("Recall   :", recall_score(y_test, y_pred, average="macro"))
 
-tn, fp, fn, tp = cm.ravel()
-specificity = tn / (tn + fp)
+#tn, fp, fn, tp = cm.ravel()    # specificity przewaznie dla klasyfikacji binarnej sie wylicza tylko
+#specificity = tn / (tn + fp)
 
-print(f"Specificity: {specificity:.4f}")
-print("F1-score :", f1_score(y_test, y_pred))
+#print(f"Specificity: {specificity:.4f}")
+print("F1-score :", f1_score(y_test, y_pred, average="macro"))
 
 # %%
 # MACIERZ POMYLEK
-labels = [
-        "african",
-        "australia",
-        "bermuda",
-        "canada",
-        "england",
-        "hongkong",
-        "indian",
-        "ireland",
-        "malaysia",
-        "newzealand",
-        "philippines",
-        "scotland",
-        "singapore",
-        "southatlandtic",
-        "us",
-        "wales",
+labels_gender = [
+    "Female",
+    "Male",
+]
+
+labels_accent = [
+    "african",
+    "australia",
+    "bermuda",
+    "canada",
+    "england",
+    "hongkong",
+    "indian",
+    "ireland",
+    "malaysia",
+    "newzealand",
+    "philippines",
+    "scotland",
+    "singapore",
+    "southatlandtic",
+    "us",
+    "wales",
+]
+
+lables_age = [
+    "eighties",
+    "fifties",
+    "fourties",
+    "seventies",
+    "sixties",
+    "teens",
+    "thirties",
+    "twenties",
 ]
 
 plt.figure(figsize=(7, 6))
@@ -230,8 +246,8 @@ sns.heatmap(
     annot=True,
     fmt="d",
     cmap="Blues",
-    xticklabels=labels,
-    yticklabels=labels
+    xticklabels=lables_age,
+    yticklabels=lables_age,
 )
 
 plt.xlabel("Klasa przewidziana")
