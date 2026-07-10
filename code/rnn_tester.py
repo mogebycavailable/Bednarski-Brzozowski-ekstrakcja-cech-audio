@@ -34,7 +34,7 @@ df
 
 # %%
 # PRZEJSCIE NA TYP NUMPY.NDARRAY
-data = df[["mel_eq_path", "age"]].to_numpy()
+data = df[["mfcc_eq_path", "accent"]].to_numpy()
 data
 
 # %%
@@ -102,7 +102,7 @@ def load_numpy(path):
 def load(path : str, label):
     #path = path.replace("dataset","dataset_small")
     tensor = tf.numpy_function(load_numpy, [path], tf.float32)
-    tensor.set_shape((256, 336))
+    tensor.set_shape((20, 336))
     tensor = tf.transpose(tensor)
     return tensor, label
 
@@ -153,10 +153,10 @@ print("Y shape:", y)
 # %%
 # ŁADOWANIE MODELU I CALLBACKOW
 
-import rnn_mel_age
+import rnn_mfcc_accent
 
-model = rnn_mel_age.load_model()
-callbacks = rnn_mel_age.load_callbacks()
+model = rnn_mfcc_accent.load_model()
+callbacks = rnn_mfcc_accent.load_callbacks()
 
 model.summary()
 
@@ -176,7 +176,7 @@ history = model.fit(
 # %%
 # WCZYTANIE NAJLEPSZEGO MODELU I PREDYKCJA
 
-best_rnn_model = load_model("weights/best_mel_rnn_age_model.keras")
+best_rnn_model = load_model("weights/best_mfcc_rnn_accent_model.keras")
 
 y_proba = best_rnn_model.predict(test_dataset)
 y_pred = np.argmax(y_proba, axis=1)
@@ -246,13 +246,13 @@ sns.heatmap(
     annot=True,
     fmt="d",
     cmap="Blues",
-    xticklabels=lables_age,
-    yticklabels=lables_age,
+    xticklabels=labels_accent,
+    yticklabels=labels_accent,
 )
 
 plt.xlabel("Klasa przewidziana")
 plt.ylabel("Klasa prawdziwa")
-plt.title("Macierz pomylek - Sieć rekurencyjna dla danych w skali melowej")
+plt.title("Macierz pomylek - Sieć rekurencyjna dla współczynników MFCC")
 
 plt.tight_layout()
 plt.show()
