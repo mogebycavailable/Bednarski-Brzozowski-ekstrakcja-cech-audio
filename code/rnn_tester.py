@@ -34,7 +34,7 @@ df
 
 # %%
 # PRZEJSCIE NA TYP NUMPY.NDARRAY
-data = df[["mfcc_eq_path", "accent"]].to_numpy()
+data = df[["mfcc_eq_path", "age"]].to_numpy()
 data
 
 # %%
@@ -153,10 +153,10 @@ print("Y shape:", y)
 # %%
 # ŁADOWANIE MODELU I CALLBACKOW
 
-import rnn_mfcc_accent
+import rnn_mfcc_age
 
-model = rnn_mfcc_accent.load_model()
-callbacks = rnn_mfcc_accent.load_callbacks()
+model = rnn_mfcc_age.load_model()
+callbacks = rnn_mfcc_age.load_callbacks()
 
 model.summary()
 
@@ -176,7 +176,7 @@ history = model.fit(
 # %%
 # WCZYTANIE NAJLEPSZEGO MODELU I PREDYKCJA
 
-best_rnn_model = load_model("weights/best_mfcc_rnn_accent_model.keras")
+best_rnn_model = load_model("weights/best_mfcc_rnn_age_model.keras")
 
 y_proba = best_rnn_model.predict(test_dataset)
 y_pred = np.argmax(y_proba, axis=1)
@@ -246,8 +246,8 @@ sns.heatmap(
     annot=True,
     fmt="d",
     cmap="Blues",
-    xticklabels=labels_accent,
-    yticklabels=labels_accent,
+    xticklabels=lables_age,
+    yticklabels=lables_age,
 )
 
 plt.xlabel("Klasa przewidziana")
