@@ -12,7 +12,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 def load_model():
     mlp_gender_mel_model = Sequential([
-        layer.Input(shape=(256, 336)),
+        layer.Input(shape=(336, 256)),
         layer.Flatten(),
 
         layer.Dense(512, activation='relu', kernel_regularizer=regularizers.l2(0.0001)),
@@ -61,3 +61,4 @@ def load_callbacks():
         verbose=1
     )
     return [early_stopping, checkpoint]
+# %%
