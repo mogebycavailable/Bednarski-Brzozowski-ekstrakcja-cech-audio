@@ -27,7 +27,9 @@ from sklearn.metrics import (
     recall_score,
     f1_score,
     confusion_matrix,
-    classification_report
+    classification_report,
+    roc_auc_score,
+    roc_curve
 )
 
 # %%
@@ -175,29 +177,60 @@ history = model.fit(
 # %%
 # WCZYTANIE NAJLEPSZEGO MODELU I PREDYKCJA
 
-best_mlp_mel_model = load_model("weights/best_mel_mlp_accent_model.keras")
+best_mlp_mel_model = load_model("weights/best_mel_mlp_gender_model.keras")
 
-y_proba = best_mlp_mel_model.predict(X_test)
-y_pred = np.argmax(y_proba,axis=1)
+y_proba = best_mlp_mel_model.predict(test_dataset)
+y_proba
+
+# %%
+
+y_test = np.concatenate([
+    y.numpy()
+    for _, y in test_dataset
+])
+y_test
+# %%
+
+#y_pred = np.argmax(y_proba,axis=1)
+#y_pred
+
+y_pred = (y_proba.squeeze() >= 0.5).astype(np.int32)
 y_pred
 
 # %%
 # METRYKI
 
 cm = confusion_matrix(y_test, y_pred)
-cr = classification_report(y_test, y_pred)
-print(cr)
-'''
-print("Accuracy :", accuracy_score(y_test, y_pred))
-print("Precision:", precision_score(y_test, y_pred))
-print("Recall   :", recall_score(y_test, y_pred))
+#cr = classification_report(y_test, y_pred)
+#print(cr)
+
+print("Accuracy    :", accuracy_score(y_test, y_pred))
+print("Precision   :", precision_score(y_test, y_pred))
+print("Recall      :", recall_score(y_test, y_pred))
 
 tn, fp, fn, tp = cm.ravel()
 specificity = tn / (tn + fp)
 
-print(f"Specificity: {specificity:.4f}")
-print("F1-score :", f1_score(y_test, y_pred))
-'''
+print("Specificity :",specificity)
+print("F1-score    :", f1_score(y_test, y_pred))
+roc_auc = roc_auc_score(y_test, y_proba.squeeze())
+print("ROC-AUC     :", roc_auc)
+
+# %%
+# KRZYWA ROC
+
+fpr, tpr, thresholds = roc_curve(y_test, y_proba)
+
+plt.figure(figsize=(6,7))
+sns.lineplot(x=fpr, y=tpr, label=f"ROC (AUC = {roc_auc:.3f})")
+sns.lineplot(x=[0, 1], y=[0, 1], linestyle="--", color="gray", label="Losowy klasyfikator")
+
+plt.xlabel("1 - Specyficzność")
+plt.ylabel("Czułość")
+plt.title("Krzywa ROC")
+plt.legend()
+plt.show()
+
 
 # %%
 # MACIERZ POMYLEK
@@ -217,25 +250,3 @@ plt.title("Macierz pomylek - Perceptron wielowarstwowy dla MEL-spectrogramow")
 
 plt.tight_layout()
 plt.show()
-# %%
-
-X_np = np.stack([
-    x.numpy()
-    for x, _ in ds
-])
-
-print(X_np.min())
-print(X_np.max())
-print(X_np.mean())
-print(X_np.std())
-
-print(X_np.shape)
-print(X_np.dtype)
-
-
-# %%
-np.isnan(X_np).sum()
-
-# %%
-np.isinf(X_np).sum()
-# %%
