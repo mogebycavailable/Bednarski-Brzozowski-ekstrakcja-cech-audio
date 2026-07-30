@@ -4,7 +4,6 @@
 from keras import layers as layer
 from keras.models import Sequential
 from keras import regularizers
-from keras.metrics import Precision
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 # %%

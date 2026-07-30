@@ -3,6 +3,7 @@
 
 import numpy as np
 import pandas as pd
+import tensorflow as tf
 from pathlib import Path
 
 from matplotlib import pyplot as plt
@@ -12,11 +13,11 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
 from keras import layers as layer
+from keras.layers import Normalization
 from keras.models import Sequential
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.metrics import Precision
 from keras.models import load_model
-from PIL import Image
 
 from tf_train_test_split import train_val_test_split
 
@@ -32,77 +33,141 @@ from sklearn.metrics import (
 # %%
 # WCZYTANIE DANYCH
 
-data = pd.read_csv("../dataset/dataset_index_encoded_equalized.csv")
+df = pd.read_csv("../dataset_small/dataset_index_encoded_equalized.csv")
+# data = pd.read_csv("../dataset/dataset_index_encoded_equalized.csv")
+#data = data[:3000,:]
+df
+
+# %%
+# PRZEJSCIE NA TYP NUMPY.NDARRAY
+data = df[["mel_eq_path", "gender"]].to_numpy()
 data
 
 # %%
-# PODZIAŁ NA ZMIENNE NIEZALEŻNE I ZALEŻNE
+# BADANIE ZROWNOWAZENIA ZBIORU
+print(np.bincount(data[:,1].astype(int)))
 
-independents = []
-dependent = []
+# %%
+# PODZIAŁ NA ZBIÓR TRENINGOWY, TESTOWY I WALIDACYJNY
 
-for i in range(data.shape[0]):
-    independents.append(np.load(data.loc[i,"mel_eq_path"].replace("dataset","dataset_small")))
-    dependent.append(int(data.loc[i,"accent"]))
+X = data[:,0]
+y = data[:,1].astype(np.int32)
 
-X = np.array(independents)
-y = np.array(dependent)
+X_train, X_temp, y_train, y_temp = train_test_split(
+    X,
+    y,
+    test_size=0.25,
+    random_state=42,
+    stratify=y
+)
 
-print("X.shape = "+str(X.shape))
-print("y.shape = "+str(y.shape))
+X_val, X_test, y_val, y_test = train_test_split(
+    X_temp,
+    y_temp,
+    test_size=0.60,
+    random_state=42,
+    stratify=y_temp
+)
+
+print(X_train.shape)
+print(X_val.shape)
+print(X_test.shape)
+
+# %%
+# WERYFIKACJA TYPOW DANYCH
+print(type(X_train[0]))
+print(X_train[0])
+
+# %%
+# USTALENIE WAG DLA NIEZRÓWNOWAŻONEGO ZBIORU DANYCH
+'''
+classes = np.unique(y_train)
+
+weights = compute_class_weight(
+    class_weight='balanced',
+    classes=classes,
+    y=y_train
+)
+
+class_weights = dict(zip(classes, weights))
+
+print(np.unique(y_train))
+print(class_weights)
+print(X_train.shape)
+'''
+
+# %%
+# PRZEJŚCIE NA TYP DATASET
+def load_numpy(path):
+    file = np.load(path.decode().replace("dataset","dataset_small"))
+    #print(file.shape)
+    return file.astype(np.float32)
+
+# DEFINICJA FUNKCJI MAPUJACEJ
+def load(path : str, label):
+    tensor = tf.numpy_function(load_numpy, [path], tf.float32)
+    tensor.set_shape((256, 336))
+    tensor = tf.transpose(tensor)
+    return tensor, label
 
 
 # %%
-# BADANIE ZROWNOWAZENIA ZBIORU DANYCH
+# ŁADOWANIE TENSORÓW RZĘDU DRUGIEGO (MACIERZY/TABLIC) W LOCIE PODCZAS TRENINGU
+train_dataset = (
+    tf.data.Dataset.from_tensor_slices((X_train, y_train))
+    .shuffle(10000)
+    .map(load, num_parallel_calls=tf.data.AUTOTUNE)
+    .batch(32)
+    .prefetch(tf.data.AUTOTUNE)
+)
 
-print(np.bincount(y.astype(int)))
+val_dataset = (
+    tf.data.Dataset.from_tensor_slices((X_val, y_val))
+    .map(load, num_parallel_calls=tf.data.AUTOTUNE)
+    .batch(32)
+    .prefetch(tf.data.AUTOTUNE)
+)
+
+test_dataset = (
+    tf.data.Dataset.from_tensor_slices((X_test, y_test))
+    .map(load, num_parallel_calls=tf.data.AUTOTUNE)
+    .batch(32)
+    .prefetch(tf.data.AUTOTUNE)
+)
 
 # %%
-# PODZIAŁ ZBIORU
+# STANDARYZACJA TF.DATA.DATASET
+normalizer = Normalization(axis=-1)
+normalizer.adapt(train_dataset.map(lambda x, y: x))
+train_dataset = train_dataset.map(lambda x, y: (normalizer(x), y))
+test_dataset = test_dataset.map(lambda x, y: (normalizer(x), y))
+val_dataset = val_dataset.map(lambda x, y: (normalizer(x), y))
 
-X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.15, stratify=y, random_state=42)
-
-print("X_train shape:", X_train.shape)
-print("y_train shape:", y_train.shape)
-
-print("X dtype:", X_train.dtype)
-print("y dtype:", y_train.dtype)
-
-# %%
-
-# STANDARYZACJA DANYCH
-N, H, W = X_train.shape
-
-X_train_flat = X_train.reshape(N, -1)
-X_test_flat  = X_test.reshape(X_test.shape[0], -1)
-
-scaler = StandardScaler()
-
-X_train_scaled = scaler.fit_transform(X_train_flat)
-X_test_scaled  = scaler.transform(X_test_flat)
-
-X_train = X_train_scaled.reshape(N, H, W)
-X_test  = X_test_scaled.reshape(X_test.shape[0], H, W)
+x, y = next(iter(train_dataset))
+print("X shape:", x.shape)
+print("Y shape:", y.shape)
 
 # %%
 # ŁADOWANIE MODELU I CALLBACKOW
 
-import mlp_mel_accent
+import mlp_mel_gender
 
-model = mlp_mel_accent.load_model()
-callbacks = mlp_mel_accent.load_callbacks()
+model = mlp_mel_gender.load_model()
+callbacks = mlp_mel_gender.load_callbacks()
 
 model.summary()
+
+
 
 # %%
 # TRENOWANIE MODELU I ZAPIS HISTORII TRENINGU
 
 history = model.fit(
-    X_train,
-    y_train,
-    validation_split=0.1,
+    train_dataset,
+    validation_data=val_dataset,
     epochs=100,
-    batch_size=32,
+    batch_size=16,
+    #class_weight=class_weights,
     callbacks=callbacks,
     verbose=1
 )

@@ -3,6 +3,7 @@
 
 from keras import layers as layer
 from keras.models import Sequential
+from keras import regularizers
 from keras.metrics import AUC
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
@@ -14,13 +15,19 @@ def load_model():
         layer.Input(shape=(256, 336)),
         layer.Flatten(),
 
-        layer.Dense(512, activation='relu'),
+        layer.Dense(512, activation='relu', kernel_regularizer=regularizers.l2(0.0001)),
+        layer.BatchNormalization(),
+        layer.Dropout(0.4),
+
+        layer.Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.0001)),
+        layer.BatchNormalization(),
+        layer.Dropout(0.4),
+
+        layer.Dense(128, activation='relu', kernel_regularizer=regularizers.l2(0.0001)),
         layer.Dropout(0.3),
 
-        layer.Dense(128, activation='relu'),
-        layer.Dropout(0.3),
-
-        layer.Dense(32, activation='relu'),
+        layer.Dense(64, activation='relu'),
+        layer.Dropout(0.2),
 
         layer.Dense(1, activation='sigmoid')
     ])
@@ -47,13 +54,10 @@ def load_callbacks():
     verbose=1
     )
     checkpoint = ModelCheckpoint(
-        filepath='weights/best_mel_mlp_model.keras',
+        filepath='weights/best_mlp_mel_gender_model.keras',
         monitor='val_loss',
         save_best_only=True,
         mode='min',
         verbose=1
     )
     return [early_stopping, checkpoint]
-
-
-# %%
