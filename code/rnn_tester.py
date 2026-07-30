@@ -19,7 +19,8 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
     f1_score,
-    confusion_matrix
+    confusion_matrix,
+    classification_report
 )
 import tensorflow as tf
 from keras.layers import Normalization
@@ -121,21 +122,21 @@ train_dataset = (
     tf.data.Dataset.from_tensor_slices((X_train, y_train))
     .shuffle(10000)
     .map(load, num_parallel_calls=tf.data.AUTOTUNE)
-    .batch(64)
+    .batch(32)
     .prefetch(tf.data.AUTOTUNE)
 )
 
 val_dataset = (
     tf.data.Dataset.from_tensor_slices((X_val, y_val))
     .map(load, num_parallel_calls=tf.data.AUTOTUNE)
-    .batch(64)
+    .batch(32)
     .prefetch(tf.data.AUTOTUNE)
 )
 
 test_dataset = (
     tf.data.Dataset.from_tensor_slices((X_test, y_test))
     .map(load, num_parallel_calls=tf.data.AUTOTUNE)
-    .batch(64)
+    .batch(32)
     .prefetch(tf.data.AUTOTUNE)
 )
 
@@ -167,7 +168,7 @@ history = model.fit(
     train_dataset,
     validation_data=val_dataset,
     epochs=100,
-    batch_size=16,
+    batch_size=32,
     #class_weight=class_weights,
     callbacks=callbacks,
     verbose=1
@@ -191,6 +192,7 @@ y_test = np.concatenate([
 
 # %%
 cm = confusion_matrix(y_test, y_pred)
+#cr = classification_report(y_test, y_pred)
 
 print("Accuracy :", accuracy_score(y_test, y_pred))
 print("Precision:", precision_score(y_test, y_pred, average="macro"))
