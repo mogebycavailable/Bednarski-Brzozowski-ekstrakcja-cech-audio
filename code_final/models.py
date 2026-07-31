@@ -736,7 +736,7 @@ def load_callbacks(model_name : str):
     patience=10,
     verbose=1
     )
-    filepath = "weights/best_"+model_name+"_model.keras"
+    filepath = "../weights/best_"+model_name+"_model.keras"
     checkpoint = ModelCheckpoint(
         filepath=filepath,
         monitor='val_loss',

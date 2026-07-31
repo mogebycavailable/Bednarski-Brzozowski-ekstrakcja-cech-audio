@@ -1,4 +1,5 @@
 MODELS = [
+    
     # MLP MEL
     {
         "name": "mlp_gender_mel",
@@ -12,13 +13,14 @@ MODELS = [
         "dependent_variable": "age",
         "loader": "load_model_MLPAgeMel"
     },
+    
     {
         "name": "mlp_accent_mel",
         "independent_variable": "mel_eq_path",
         "dependent_variable": "accent",
         "loader": "load_model_MLPAccentMel"
     },
-
+    
     # MLP MFCC
     {
         "name": "mlp_gender_mfcc",
@@ -32,9 +34,10 @@ MODELS = [
         "dependent_variable": "age",
         "loader": "load_model_MLPAgeMFCC"
     },
+
     {
         "name": "mlp_accent_mfcc",
-        "independent_variable": "mfcc_eq_path",
+       "independent_variable": "mfcc_eq_path",
         "dependent_variable": "accent",
         "loader": "load_model_MLPAccentMFCC"
     },
@@ -86,6 +89,7 @@ MODELS = [
         "dependent_variable": "gender",
         "loader": "load_model_CNNGenderMel"
     },
+
     {
         "name": "cnn_age_mel",
         "independent_variable": "mel_spec_path",
@@ -118,4 +122,5 @@ MODELS = [
         "dependent_variable": "accent",
         "loader": "load_model_CNNAccentMFCC"
     }
+
 ]

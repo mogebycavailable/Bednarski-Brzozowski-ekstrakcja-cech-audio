@@ -24,3 +24,6 @@ dataset_small/mfcc_spec
 dataset_small/mfcc_num_eq
 dataset_small/mel_num_eq
 dataset_small.zip
+
+*.keras
+weights/*.keras
