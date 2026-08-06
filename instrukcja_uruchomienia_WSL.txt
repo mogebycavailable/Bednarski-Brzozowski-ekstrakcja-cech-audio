@@ -1,0 +1,46 @@
+1. wsl --install -d Ubuntu
+(zeby usunac wsl trzeba wykonac: wsl --unregister Ubuntu)
+(żeby wejsc do WSL nalezy wpisac: wsl -d Ubuntu)
+(username i haslo mozna ustawic np. ubuntu)
+
+2. sudo apt update
+3. sudo apt upgrade
+4. nvidia-smi
+
+Chcemy pythona3.10:
+5. sudo apt install software-properties-common
+6. sudo add-apt-repository ppa:deadsnakes/ppa
+7. sudo apt update
+8. sudo apt install python3.10 python3.10-venv python3.10-dev
+9. python3.10 --version
+
+10. cd ~
+11. mkdir Projekt_magisterski
+11. cp -r "/mnt/d/Projekt magisterski/code_final" ~/Projekt_magisterski/
+12. cd ~/Projekt_magisterski
+13. ln -s "/mnt/d/Projekt magisterski/dataset" dataset
+14. ls -l
+15. ls dataset
+
+16. python3.10 -m venv tf-gpu
+17. source tf-gpu/bin/activate
+18. python --version
+19. which python
+
+20. pip install --upgrade pip
+21. pip install "tensorflow[and-cuda]==2.15.1"
+22. exit
+23. wsl -d Ubuntu
+24. cd ~
+25. cd Projekt_magisterski
+26. source tf-gpu/bin/activate
+27. cd code_final/
+28. python3.10 test_gpu.py
+(na dole powinien być wynik: 
+Available GPUs:
+PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')
+)
+
+29. pip install pandas scikit-learn
+
+30. python3.10 train_all_models.py

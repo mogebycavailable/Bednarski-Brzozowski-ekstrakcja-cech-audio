@@ -27,3 +27,6 @@ dataset_small.zip
 
 *.keras
 weights/*.keras
+
+tf-gpu
+conf-tf-gpu-env.txt

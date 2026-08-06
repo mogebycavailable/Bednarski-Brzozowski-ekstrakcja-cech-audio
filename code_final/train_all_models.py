@@ -44,7 +44,11 @@ from sklearn.metrics import (
 
 # FUNKCJA WSPIERAJACA FUNKCJE MAPUJACA DLA PLIKOW .numpy
 def fetch_numpy(path):
-    file = np.load(path.decode())
+    # For Linux
+    path = path.decode().replace("\\", "/")
+    file = np.load(path)
+    # For Windows
+    #file = np.load(path.decode())
     return file.astype(np.float32)
 
 # DEFINICJA FUNKCJI MAPUJACEJ DLA PLIKOW .numpy w skali melowej
