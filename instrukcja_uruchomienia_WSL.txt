@@ -1,7 +1,15 @@
+Pobrać z Google Drive dwa ZIP-y:
+dataset_final.zip - przygotowany do treningu zbiór danych (wypakowany ok. 60 GB)
+UWAGA!!! nalezy wypakować zawartość folderu zip do katalogu o nazwie: dataset
+(jest to konieczne, poniewaz w kodzie bedziemy korzystac ze sciezek wzglednych o narzuconych nazwach)
+code.zip - kod programu
+
+W PowerShell-u lub CMD (najlepiej z uprawnieniami administratora):
+(cała maszyna wirtualna, z bibliotekami może zająć ok. 20 GB)
 1. wsl --install -d Ubuntu
-(zeby usunac wsl trzeba wykonac: wsl --unregister Ubuntu)
-(żeby wejsc do WSL nalezy wpisac: wsl -d Ubuntu)
-(username i haslo mozna ustawic np. ubuntu)
+(żeby usunąć wsl trzeba wykonać: wsl --unregister Ubuntu)
+(żeby wejść już do istniejącego WSL należy wpisać: wsl -d Ubuntu)
+(username i hasło mozna ustawic np. ubuntu)
 
 2. sudo apt update
 3. sudo apt upgrade
@@ -16,31 +24,61 @@ Chcemy pythona3.10:
 
 10. cd ~
 11. mkdir Projekt_magisterski
-11. cp -r "/mnt/d/Projekt magisterski/code_final" ~/Projekt_magisterski/
-12. cd ~/Projekt_magisterski
-13. ln -s "/mnt/d/Projekt magisterski/dataset" dataset
-14. ls -l
-15. ls dataset
+12. cp -r "/mnt/d/Projekt magisterski/code" ~/Projekt_magisterski/
+(Należy skopiować tylko katalog code z odpowiedniej ścieżki, /mnt/c/... lub /mnt/d/... to nasze dyski C lub D z zawartością w systemie Windows.
+Na przykład, jeśli wypakowany z ZIP-a katalog code, znajduję się w katalogu Pobrane w Windowsie to należy użyć polecenia:
+cp -r "/mnt/c/Users/[nazwa_uzytkownika]/Downloads/code" ~/Projekt_magisterski/
+)
+13. cd ~/Projekt_magisterski
+14. ln -s "/mnt/c/Users/[nazwa_uzytkownika]/Downloads/dataset" dataset
+(Tutaj tak samo, podać należy ścieżkę gdzie znajduje się wypakowany z ZIP-a katalog dataset.
+Ta komenda sprawi, że program będzie korzystał z tego zbioru danych tam gdzie został wypakowany, bez konieczności
+niepotrzebnego kopiowania tego folderu do Linuxa.)
+15. ls -l
+16. ls dataset
 
-16. python3.10 -m venv tf-gpu
-17. source tf-gpu/bin/activate
-18. python --version
-19. which python
+### Tak to powinno wyglądać mniej więcej w WSL Ubuntu (u nas katalog z projektem był umieszczony na dysku D)
+ubuntu@DESKTOP-3H7S269:~/Projekt_magisterski$ ls -l
+total 4
+drwxr-xr-x 2 ubuntu ubuntu 4096 Aug  8 01:43 code
+lrwxrwxrwx 1 ubuntu ubuntu   34 Aug  8 01:50 dataset -> '/mnt/d/Projekt magisterski/dataset'
+###
 
-20. pip install --upgrade pip
-21. pip install "tensorflow[and-cuda]==2.15.1"
-22. exit
-23. wsl -d Ubuntu
-24. cd ~
-25. cd Projekt_magisterski
-26. source tf-gpu/bin/activate
-27. cd code_final/
-28. python3.10 test_gpu.py
+17. python3.10 -m venv tf-gpu
+18. source tf-gpu/bin/activate
+19. python --version
+20. which python
+
+21. pip install --upgrade pip
+22. pip install "tensorflow[and-cuda]==2.15.1"
+
+Restart maszyny wirtualnej:
+23. exit
+24. wsl -d Ubuntu
+
+Sprawdzenie możliwości korzystanie z akceleracji GPU:
+25. cd ~
+26. cd Projekt_magisterski
+27. source tf-gpu/bin/activate
+28. cd code/
+29. python3.10 test_gpu.py
 (na dole powinien być wynik: 
 Available GPUs:
 PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')
 )
 
-29. pip install pandas scikit-learn
+Doinstalowanie brakujących pakietów oraz uruchomienie kodu programu:
+30. pip install pandas scikit-learn
 
-30. python3.10 train_all_models.py
+31. python3.10 train_all_models.py
+
+W Menedżerze zadań w Windowsie można sprawdzić czy faktycznie GPU jest wykorzystywane.
+
+PO ZAKOŃCZENIU BADANIA:
+Znajdując się w katalogu domowym ~/Projekt_magisterski, należy wykonać 2 następujące komendy:
+
+1. cp -r results "/mnt/c/Users/Tomek/Downloads/"
+2. cp -r weights "/mnt/c/Users/Tomek/Downloads/"
+
+Spowoduje to skopiowanie 2 katalogów wynikowych z powrotem do systemu Windows we wskazanej lokalizacji.
+Bardzo prosimy o odesłanie tych 2 folderów z powrotem na udostępniony folder Google Drive: Bednarski Brzozowski

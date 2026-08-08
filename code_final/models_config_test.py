@@ -1,22 +1,24 @@
 MODELS = [
+
     {
-        "name": "mlp_gender_mel",
+        "name": "rnn_accent_mel",
         "independent_variable": "mel_eq_path",
-        "dependent_variable": "gender",
-        "loader": "load_model_MLPGenderMel"
+        "dependent_variable": "accent",
+        "loader": "load_model_RNNAccentMel"
     },
 
     {
-        "name": "rnn_gender_mfcc",
-        "independent_variable": "mfcc_eq_path",
-        "dependent_variable": "gender",
-        "loader": "load_model_RNNGenderMFCC"
-    },
-
-    {
-        "name": "cnn_gender_mel",
+        "name": "cnn_accent_mel",
         "independent_variable": "mel_spec_path",
-        "dependent_variable": "gender",
-        "loader": "load_model_CNNGenderMel"
+        "dependent_variable": "accent",
+        "loader": "load_model_CNNAccentMel"
     },
+
+        {
+        "name": "mlp_accent_mel",
+        "independent_variable": "mel_eq_path",
+        "dependent_variable": "accent",
+        "loader": "load_model_MLPAccentMel"
+    },
+
 ]

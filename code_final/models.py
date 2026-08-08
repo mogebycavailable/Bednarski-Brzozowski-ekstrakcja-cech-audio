@@ -95,7 +95,7 @@ def load_model_MLPAccentMel():
         layer.Dense(64, activation='relu'),
         layer.Dropout(0.2),
 
-        layer.Dense(16, activation='sofmax')
+        layer.Dense(16, activation='softmax')
     ])
 
     model.compile(
@@ -196,7 +196,7 @@ def load_model_MLPAccentMFCC():
         layer.Dense(64, activation='relu'),
         layer.Dropout(0.2),
 
-        layer.Dense(16, activation='sofmax')
+        layer.Dense(16, activation='softmax')
     ])
 
     model.compile(
@@ -218,8 +218,7 @@ def load_model_RNNGenderMel():
             layer.LSTM(
                 128,
                 return_sequences=True,
-                dropout=0.2,
-                recurrent_dropout=0.2
+                dropout=0.2
             )
         ),
 
@@ -229,8 +228,7 @@ def load_model_RNNGenderMel():
         layer.Bidirectional(
             layer.LSTM(
                 64,
-                dropout=0.2,
-                recurrent_dropout=0.2
+                dropout=0.2
             )
         ),
         layer.LayerNormalization(),
@@ -266,8 +264,7 @@ def load_model_RNNAgeMel():
             layer.LSTM(
                 128,
                 return_sequences=True,
-                dropout=0.2,
-                recurrent_dropout=0.2
+                dropout=0.2
             )
         ),
 
@@ -277,8 +274,7 @@ def load_model_RNNAgeMel():
         layer.Bidirectional(
             layer.LSTM(
                 64,
-                dropout=0.2,
-                recurrent_dropout=0.2
+                dropout=0.2
             )
         ),
         layer.LayerNormalization(),
@@ -309,8 +305,7 @@ def load_model_RNNAccentMel():
             layer.LSTM(
                 128,
                 return_sequences=True,
-                dropout=0.2,
-                recurrent_dropout=0.2
+                dropout=0.2
             )
         ),
 
@@ -320,8 +315,7 @@ def load_model_RNNAccentMel():
         layer.Bidirectional(
             layer.LSTM(
                 64,
-                dropout=0.2,
-                recurrent_dropout=0.2
+                dropout=0.2
             )
         ),
         layer.LayerNormalization(),
@@ -352,8 +346,7 @@ def load_model_RNNGenderMFCC():
             layer.LSTM(
                 128,
                 return_sequences=True,
-                dropout=0.2,
-                recurrent_dropout=0.2
+                dropout=0.2
             )
         ),
 
@@ -363,8 +356,7 @@ def load_model_RNNGenderMFCC():
         layer.Bidirectional(
             layer.LSTM(
                 64,
-                dropout=0.2,
-                recurrent_dropout=0.2
+                dropout=0.2
             )
         ),
         layer.LayerNormalization(),
@@ -400,8 +392,7 @@ def load_model_RNNAgeMFCC():
             layer.LSTM(
                 128,
                 return_sequences=True,
-                dropout=0.2,
-                recurrent_dropout=0.2
+                dropout=0.2
             )
         ),
 
@@ -411,8 +402,7 @@ def load_model_RNNAgeMFCC():
         layer.Bidirectional(
             layer.LSTM(
                 64,
-                dropout=0.2,
-                recurrent_dropout=0.2
+                dropout=0.2
             )
         ),
         layer.LayerNormalization(),
@@ -443,8 +433,7 @@ def load_model_RNNAccentMFCC():
             layer.LSTM(
                 128,
                 return_sequences=True,
-                dropout=0.2,
-                recurrent_dropout=0.2
+                dropout=0.2
             )
         ),
 
@@ -454,8 +443,7 @@ def load_model_RNNAccentMFCC():
         layer.Bidirectional(
             layer.LSTM(
                 64,
-                dropout=0.2,
-                recurrent_dropout=0.2
+                dropout=0.2
             )
         ),
         layer.LayerNormalization(),

@@ -21,7 +21,7 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 
 import models
-from models_config_test import MODELS
+from models_config import MODELS
 
 from keras.layers import Normalization
 from keras.models import load_model
@@ -67,6 +67,7 @@ def load_numpy_for_mfcc(path : str, label):
 
 # DEFINICJA FUNKCJI MAPUJACEJ DLA OBRAZOW .png
 def load_img(path : str, label):
+    path = tf.strings.regex_replace(path, r"\\", "/")
     img = tf.io.read_file(path)
     img = tf.io.decode_png(img, channels=1)
     if img.shape[0] != 128 or img.shape[1] != 256:
@@ -337,6 +338,12 @@ for i,config in enumerate(MODELS,start=1):
             lines.append("Specificity :"+str(specificity))
             lines.append("F1-score    :"+str(f1_score(y_test, y_pred)))
             lines.append("ROC-AUC     :"+str(roc_auc))
+
+            if(VERBOSE == 1):
+                print("\nMetryki modelu: ")
+                for line in lines:
+                    print(line)
+
             with open("../results/metrics/"+name+".txt", "w", encoding="utf-8") as f:
                     for line in lines:
                         f.write(line + "\n")
@@ -353,11 +360,6 @@ for i,config in enumerate(MODELS,start=1):
         print("Metryki zapisane do pliku.\n")
         np.save("../results/confusion_matrixes/"+name+"_cm.npy", cm)
         print("Macierz pomylek zapisana do pliku.\n")
-
-        if(VERBOSE == 1):
-            print("\nMetryki modelu: ")
-            for line in lines:
-                print(line)
 
     except Exception as e:
         print(f"Blad podczas trenowania modelu {i}: {e}")
