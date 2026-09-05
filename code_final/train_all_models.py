@@ -21,7 +21,7 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 
 import models
-from models_config import MODELS
+from models_config_test import MODELS
 
 from keras.layers import Normalization
 from keras.models import load_model

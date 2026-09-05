@@ -41,7 +41,7 @@ MODELS = [
         "dependent_variable": "accent",
         "loader": "load_model_MLPAccentMFCC"
     },
-
+    
     # RNN MEL
     {
         "name": "rnn_gender_mel",

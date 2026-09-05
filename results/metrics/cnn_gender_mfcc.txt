@@ -1,6 +1,0 @@
-Accuracy    :0.7333333333333333
-Precision   :0.7333333333333333
-Sensivity   :1.0
-Specificity :0.0
-F1-score    :0.8461538461538461
-ROC-AUC     :0.6363636363636365
