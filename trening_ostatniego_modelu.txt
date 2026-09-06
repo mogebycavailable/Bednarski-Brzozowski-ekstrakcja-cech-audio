@@ -1,0 +1,395 @@
+(tf-gpu) ubuntu@DESKTOP-3H7S269:~/Projekt_magisterski/code$ python3.10 train_all_models.py
+2026-09-05 16:43:13.371149: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2026-09-05 16:43:13.371220: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2026-09-05 16:43:13.372018: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2026-09-05 16:43:13.377533: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2026-09-05 16:43:14.101355: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2026-09-05 16:43:15.588128: I external/local_xla/xla/stream_executor/cuda/cuda_executor.cc:887] could not open file to read NUMA node: /sys/bus/pci/devices/0000:07:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2026-09-05 16:43:15.635156: I external/local_xla/xla/stream_executor/cuda/cuda_executor.cc:887] could not open file to read NUMA node: /sys/bus/pci/devices/0000:07:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2026-09-05 16:43:15.635270: I external/local_xla/xla/stream_executor/cuda/cuda_executor.cc:887] could not open file to read NUMA node: /sys/bus/pci/devices/0000:07:00.0/numa_node
+Your kernel may have been built without NUMA support.
+Znaleziono GPU:
+PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')
+
+
+##### --- TRENING MODELU 1/1 --- #####
+        Informacje o trenowanym modelu:
+        Nazwa: rnn_accent_mfcc
+        Zmienna niezalezna: mfcc_eq_path
+        Zmienna zalezna: accent
+
+Rozpoczynam przygotowanie zbioru danych mfcc_eq_path -> accent...
+Wymiary calego zbioru danych: (122136, 10)
+Wymiary zbioru danych po wykluczeniu probek invalid: (117564, 10)
+Informacja o zrownowazeniu szykowanego zbioru danych:
+[ 1652  7202   256  7236 28309   419 10214  1640   278  2482   566  2641
+   155   231 53683   600]
+Rozmiar tensora danych treningowych  : (88173,)
+Rozmiar tensora danych walidacyjnych : (11756,)
+Rozmiar tensora danych testowych     : (17635,)
+2026-09-05 16:43:16.968171: I external/local_xla/xla/stream_executor/cuda/cuda_executor.cc:887] could not open file to read NUMA node: /sys/bus/pci/devices/0000:07:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2026-09-05 16:43:16.968287: I external/local_xla/xla/stream_executor/cuda/cuda_executor.cc:887] could not open file to read NUMA node: /sys/bus/pci/devices/0000:07:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2026-09-05 16:43:16.968376: I external/local_xla/xla/stream_executor/cuda/cuda_executor.cc:887] could not open file to read NUMA node: /sys/bus/pci/devices/0000:07:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2026-09-05 16:43:17.242107: I external/local_xla/xla/stream_executor/cuda/cuda_executor.cc:887] could not open file to read NUMA node: /sys/bus/pci/devices/0000:07:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2026-09-05 16:43:17.242248: I external/local_xla/xla/stream_executor/cuda/cuda_executor.cc:887] could not open file to read NUMA node: /sys/bus/pci/devices/0000:07:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2026-09-05 16:43:17.242290: I tensorflow/core/common_runtime/gpu/gpu_device.cc:2022] Could not identify NUMA node of platform GPU id 0, defaulting to 0.  Your kernel may not have been built with NUMA support.
+2026-09-05 16:43:17.242449: I external/local_xla/xla/stream_executor/cuda/cuda_executor.cc:887] could not open file to read NUMA node: /sys/bus/pci/devices/0000:07:00.0/numa_node
+Your kernel may have been built without NUMA support.
+2026-09-05 16:43:17.242507: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1929] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 4055 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 2060, pci bus id: 0000:07:00.0, compute capability: 7.5
+2026-09-05 16:43:17.628149: I external/local_tsl/tsl/platform/default/subprocess.cc:304] Start cannot spawn child process: No such file or directory
+Rozmiary tensorow zmiennych niezaleznych (X) i zaleznych (y):
+X shape: (32, 336, 20)
+Y shape: (32,)
+Zakonczylem przygotowywanie zbioru danych mfcc_eq_path -> accent.
+
+Model: "sequential"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #
+=================================================================
+ layer_normalization (Layer  (None, 336, 20)           40
+ Normalization)
+
+ bidirectional (Bidirection  (None, 336, 256)          152576
+ al)
+
+ layer_normalization_1 (Lay  (None, 336, 256)          512
+ erNormalization)
+
+ dropout (Dropout)           (None, 336, 256)          0
+
+ bidirectional_1 (Bidirecti  (None, 128)               164352
+ onal)
+
+ layer_normalization_2 (Lay  (None, 128)               256
+ erNormalization)
+
+ dropout_1 (Dropout)         (None, 128)               0
+
+ dense (Dense)               (None, 64)                8256
+
+ batch_normalization (Batch  (None, 64)                256
+ Normalization)
+
+ activation (Activation)     (None, 64)                0
+
+ dropout_2 (Dropout)         (None, 64)                0
+
+ dense_1 (Dense)             (None, 16)                1040
+
+=================================================================
+Total params: 327288 (1.25 MB)
+Trainable params: 327160 (1.25 MB)
+Non-trainable params: 128 (512.00 Byte)
+_________________________________________________________________
+Epoch 1/100
+2026-09-05 16:45:56.856547: I external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:454] Loaded cuDNN version 8904
+2026-09-05 16:45:58.170983: I external/local_xla/xla/service/service.cc:168] XLA service 0x7f6fc8b0a330 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2026-09-05 16:45:58.171042: I external/local_xla/xla/service/service.cc:176]   StreamExecutor device (0): NVIDIA GeForce RTX 2060, Compute Capability 7.5
+2026-09-05 16:45:58.193241: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:269] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1788619558.325800    1039 device_compiler.h:186] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+2756/2756 [==============================] - ETA: 0s - loss: 1.7336 - accuracy: 0.4373
+Epoch 1: val_loss improved from inf to 1.62604, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 398s 142ms/step - loss: 1.7336 - accuracy: 0.4373 - val_loss: 1.6260 - val_accuracy: 0.4618
+Epoch 2/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.6599 - accuracy: 0.4583
+Epoch 2: val_loss improved from 1.62604 to 1.59800, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 394s 143ms/step - loss: 1.6599 - accuracy: 0.4583 - val_loss: 1.5980 - val_accuracy: 0.4728
+Epoch 3/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.6093 - accuracy: 0.4681
+Epoch 3: val_loss improved from 1.59800 to 1.55659, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 403s 146ms/step - loss: 1.6093 - accuracy: 0.4681 - val_loss: 1.5566 - val_accuracy: 0.4796
+Epoch 4/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.5773 - accuracy: 0.4746
+Epoch 4: val_loss improved from 1.55659 to 1.52497, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 401s 146ms/step - loss: 1.5773 - accuracy: 0.4746 - val_loss: 1.5250 - val_accuracy: 0.4955
+Epoch 5/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.5383 - accuracy: 0.4924
+Epoch 5: val_loss improved from 1.52497 to 1.48681, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 398s 144ms/step - loss: 1.5383 - accuracy: 0.4924 - val_loss: 1.4868 - val_accuracy: 0.5127
+Epoch 6/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.4808 - accuracy: 0.5193
+Epoch 6: val_loss improved from 1.48681 to 1.39228, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 398s 145ms/step - loss: 1.4808 - accuracy: 0.5193 - val_loss: 1.3923 - val_accuracy: 0.5507
+Epoch 7/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.4156 - accuracy: 0.5487
+Epoch 7: val_loss improved from 1.39228 to 1.37576, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 394s 143ms/step - loss: 1.4156 - accuracy: 0.5487 - val_loss: 1.3758 - val_accuracy: 0.5527
+Epoch 8/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.3520 - accuracy: 0.5730
+Epoch 8: val_loss improved from 1.37576 to 1.30320, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 402s 146ms/step - loss: 1.3520 - accuracy: 0.5730 - val_loss: 1.3032 - val_accuracy: 0.5775
+Epoch 9/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.3010 - accuracy: 0.5926
+Epoch 9: val_loss improved from 1.30320 to 1.23338, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 402s 146ms/step - loss: 1.3010 - accuracy: 0.5926 - val_loss: 1.2334 - val_accuracy: 0.6108
+Epoch 10/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.2543 - accuracy: 0.6076
+Epoch 10: val_loss improved from 1.23338 to 1.19447, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 402s 146ms/step - loss: 1.2543 - accuracy: 0.6076 - val_loss: 1.1945 - val_accuracy: 0.6175
+Epoch 11/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.2109 - accuracy: 0.6220
+Epoch 11: val_loss improved from 1.19447 to 1.15252, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 404s 147ms/step - loss: 1.2109 - accuracy: 0.6220 - val_loss: 1.1525 - val_accuracy: 0.6362
+Epoch 12/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.1754 - accuracy: 0.6346
+Epoch 12: val_loss did not improve from 1.15252
+2756/2756 [==============================] - 402s 146ms/step - loss: 1.1754 - accuracy: 0.6346 - val_loss: 1.1835 - val_accuracy: 0.6296
+Epoch 13/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.1429 - accuracy: 0.6491
+Epoch 13: val_loss improved from 1.15252 to 1.12907, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 403s 146ms/step - loss: 1.1429 - accuracy: 0.6491 - val_loss: 1.1291 - val_accuracy: 0.6487
+Epoch 14/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.1133 - accuracy: 0.6548
+Epoch 14: val_loss improved from 1.12907 to 1.05369, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 399s 145ms/step - loss: 1.1133 - accuracy: 0.6548 - val_loss: 1.0537 - val_accuracy: 0.6694
+Epoch 15/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.0825 - accuracy: 0.6674
+Epoch 15: val_loss improved from 1.05369 to 1.05014, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 399s 145ms/step - loss: 1.0825 - accuracy: 0.6674 - val_loss: 1.0501 - val_accuracy: 0.6682
+Epoch 16/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.0638 - accuracy: 0.6737
+Epoch 16: val_loss improved from 1.05014 to 1.03314, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 401s 146ms/step - loss: 1.0638 - accuracy: 0.6737 - val_loss: 1.0331 - val_accuracy: 0.6780
+Epoch 17/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.0394 - accuracy: 0.6807
+Epoch 17: val_loss improved from 1.03314 to 1.01675, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 401s 145ms/step - loss: 1.0394 - accuracy: 0.6807 - val_loss: 1.0167 - val_accuracy: 0.6830
+Epoch 18/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.0192 - accuracy: 0.6878
+Epoch 18: val_loss did not improve from 1.01675
+2756/2756 [==============================] - 399s 145ms/step - loss: 1.0192 - accuracy: 0.6878 - val_loss: 1.0261 - val_accuracy: 0.6814
+Epoch 19/100
+2756/2756 [==============================] - ETA: 0s - loss: 1.0017 - accuracy: 0.6930
+Epoch 19: val_loss improved from 1.01675 to 1.00070, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 398s 144ms/step - loss: 1.0017 - accuracy: 0.6930 - val_loss: 1.0007 - val_accuracy: 0.6847
+Epoch 20/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.9798 - accuracy: 0.6974
+Epoch 20: val_loss improved from 1.00070 to 0.98899, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 396s 144ms/step - loss: 0.9798 - accuracy: 0.6974 - val_loss: 0.9890 - val_accuracy: 0.6920
+Epoch 21/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.9670 - accuracy: 0.7027
+Epoch 21: val_loss did not improve from 0.98899
+2756/2756 [==============================] - 402s 146ms/step - loss: 0.9670 - accuracy: 0.7027 - val_loss: 0.9938 - val_accuracy: 0.6886
+Epoch 22/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.9509 - accuracy: 0.7070
+Epoch 22: val_loss improved from 0.98899 to 0.94094, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 401s 146ms/step - loss: 0.9509 - accuracy: 0.7070 - val_loss: 0.9409 - val_accuracy: 0.7020
+Epoch 23/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.9375 - accuracy: 0.7121
+Epoch 23: val_loss did not improve from 0.94094
+2756/2756 [==============================] - 395s 143ms/step - loss: 0.9375 - accuracy: 0.7121 - val_loss: 0.9964 - val_accuracy: 0.6918
+Epoch 24/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.9184 - accuracy: 0.7169
+Epoch 24: val_loss improved from 0.94094 to 0.93740, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 406s 147ms/step - loss: 0.9184 - accuracy: 0.7169 - val_loss: 0.9374 - val_accuracy: 0.7086
+Epoch 25/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.8991 - accuracy: 0.7229
+Epoch 25: val_loss improved from 0.93740 to 0.93073, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 398s 144ms/step - loss: 0.8991 - accuracy: 0.7229 - val_loss: 0.9307 - val_accuracy: 0.7114
+Epoch 26/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.8806 - accuracy: 0.7288
+Epoch 26: val_loss improved from 0.93073 to 0.89698, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 400s 145ms/step - loss: 0.8806 - accuracy: 0.7288 - val_loss: 0.8970 - val_accuracy: 0.7231
+Epoch 27/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.8744 - accuracy: 0.7314
+Epoch 27: val_loss improved from 0.89698 to 0.88788, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 401s 145ms/step - loss: 0.8744 - accuracy: 0.7314 - val_loss: 0.8879 - val_accuracy: 0.7190
+Epoch 28/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.8594 - accuracy: 0.7351
+Epoch 28: val_loss improved from 0.88788 to 0.87427, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 403s 146ms/step - loss: 0.8594 - accuracy: 0.7351 - val_loss: 0.8743 - val_accuracy: 0.7293
+Epoch 29/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.8503 - accuracy: 0.7393
+Epoch 29: val_loss improved from 0.87427 to 0.86317, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 399s 145ms/step - loss: 0.8503 - accuracy: 0.7393 - val_loss: 0.8632 - val_accuracy: 0.7330
+Epoch 30/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.8402 - accuracy: 0.7427
+Epoch 30: val_loss improved from 0.86317 to 0.85237, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 403s 146ms/step - loss: 0.8402 - accuracy: 0.7427 - val_loss: 0.8524 - val_accuracy: 0.7346
+Epoch 31/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.8205 - accuracy: 0.7492
+Epoch 31: val_loss did not improve from 0.85237
+2756/2756 [==============================] - 405s 147ms/step - loss: 0.8205 - accuracy: 0.7492 - val_loss: 0.8571 - val_accuracy: 0.7338
+Epoch 32/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.8078 - accuracy: 0.7529
+Epoch 32: val_loss did not improve from 0.85237
+2756/2756 [==============================] - 397s 144ms/step - loss: 0.8078 - accuracy: 0.7529 - val_loss: 0.8562 - val_accuracy: 0.7364
+Epoch 33/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.7928 - accuracy: 0.7601
+Epoch 33: val_loss did not improve from 0.85237
+2756/2756 [==============================] - 398s 145ms/step - loss: 0.7928 - accuracy: 0.7601 - val_loss: 0.8758 - val_accuracy: 0.7322
+Epoch 34/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.7857 - accuracy: 0.7621
+Epoch 34: val_loss improved from 0.85237 to 0.83602, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 404s 147ms/step - loss: 0.7857 - accuracy: 0.7621 - val_loss: 0.8360 - val_accuracy: 0.7395
+Epoch 35/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.7678 - accuracy: 0.7671
+Epoch 35: val_loss improved from 0.83602 to 0.81141, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 402s 146ms/step - loss: 0.7678 - accuracy: 0.7671 - val_loss: 0.8114 - val_accuracy: 0.7502
+Epoch 36/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.7553 - accuracy: 0.7706
+Epoch 36: val_loss improved from 0.81141 to 0.80381, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 406s 147ms/step - loss: 0.7553 - accuracy: 0.7706 - val_loss: 0.8038 - val_accuracy: 0.7541
+Epoch 37/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.7438 - accuracy: 0.7736
+Epoch 37: val_loss did not improve from 0.80381
+2756/2756 [==============================] - 402s 146ms/step - loss: 0.7438 - accuracy: 0.7736 - val_loss: 0.8084 - val_accuracy: 0.7496
+Epoch 38/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.7336 - accuracy: 0.7750
+Epoch 38: val_loss improved from 0.80381 to 0.77574, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 402s 146ms/step - loss: 0.7336 - accuracy: 0.7750 - val_loss: 0.7757 - val_accuracy: 0.7579
+Epoch 39/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.7206 - accuracy: 0.7815
+Epoch 39: val_loss did not improve from 0.77574
+2756/2756 [==============================] - 400s 145ms/step - loss: 0.7206 - accuracy: 0.7815 - val_loss: 0.7893 - val_accuracy: 0.7634
+Epoch 40/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.7162 - accuracy: 0.7813
+Epoch 40: val_loss did not improve from 0.77574
+2756/2756 [==============================] - 409s 149ms/step - loss: 0.7162 - accuracy: 0.7813 - val_loss: 0.7834 - val_accuracy: 0.7624
+Epoch 41/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.7026 - accuracy: 0.7870
+Epoch 41: val_loss improved from 0.77574 to 0.77354, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 404s 146ms/step - loss: 0.7026 - accuracy: 0.7870 - val_loss: 0.7735 - val_accuracy: 0.7621
+Epoch 42/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.6935 - accuracy: 0.7907
+Epoch 42: val_loss improved from 0.77354 to 0.76874, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 401s 146ms/step - loss: 0.6935 - accuracy: 0.7907 - val_loss: 0.7687 - val_accuracy: 0.7654
+Epoch 43/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.6874 - accuracy: 0.7930
+Epoch 43: val_loss did not improve from 0.76874
+2756/2756 [==============================] - 409s 148ms/step - loss: 0.6874 - accuracy: 0.7930 - val_loss: 0.7817 - val_accuracy: 0.7700
+Epoch 44/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.6716 - accuracy: 0.7964
+Epoch 44: val_loss did not improve from 0.76874
+2756/2756 [==============================] - 402s 146ms/step - loss: 0.6716 - accuracy: 0.7964 - val_loss: 0.8055 - val_accuracy: 0.7599
+Epoch 45/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.6620 - accuracy: 0.8002
+Epoch 45: val_loss improved from 0.76874 to 0.75081, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 400s 145ms/step - loss: 0.6620 - accuracy: 0.8002 - val_loss: 0.7508 - val_accuracy: 0.7733
+Epoch 46/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.6578 - accuracy: 0.8014
+Epoch 46: val_loss did not improve from 0.75081
+2756/2756 [==============================] - 407s 148ms/step - loss: 0.6578 - accuracy: 0.8014 - val_loss: 0.7847 - val_accuracy: 0.7632
+Epoch 47/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.6547 - accuracy: 0.8028
+Epoch 47: val_loss did not improve from 0.75081
+2756/2756 [==============================] - 396s 144ms/step - loss: 0.6547 - accuracy: 0.8028 - val_loss: 0.7549 - val_accuracy: 0.7739
+Epoch 48/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.6436 - accuracy: 0.8062
+Epoch 48: val_loss improved from 0.75081 to 0.74408, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 399s 145ms/step - loss: 0.6436 - accuracy: 0.8062 - val_loss: 0.7441 - val_accuracy: 0.7759
+Epoch 49/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.6298 - accuracy: 0.8097
+Epoch 49: val_loss improved from 0.74408 to 0.74333, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 395s 143ms/step - loss: 0.6298 - accuracy: 0.8097 - val_loss: 0.7433 - val_accuracy: 0.7814
+Epoch 50/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.6204 - accuracy: 0.8139
+Epoch 50: val_loss did not improve from 0.74333
+2756/2756 [==============================] - 403s 146ms/step - loss: 0.6204 - accuracy: 0.8139 - val_loss: 0.7533 - val_accuracy: 0.7789
+Epoch 51/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.6089 - accuracy: 0.8161
+Epoch 51: val_loss improved from 0.74333 to 0.70993, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 401s 145ms/step - loss: 0.6089 - accuracy: 0.8161 - val_loss: 0.7099 - val_accuracy: 0.7884
+Epoch 52/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.6006 - accuracy: 0.8203
+Epoch 52: val_loss did not improve from 0.70993
+2756/2756 [==============================] - 404s 147ms/step - loss: 0.6006 - accuracy: 0.8203 - val_loss: 0.7423 - val_accuracy: 0.7856
+Epoch 53/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.5935 - accuracy: 0.8216
+Epoch 53: val_loss improved from 0.70993 to 0.69863, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 408s 148ms/step - loss: 0.5935 - accuracy: 0.8216 - val_loss: 0.6986 - val_accuracy: 0.7923
+Epoch 54/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.5843 - accuracy: 0.8237
+Epoch 54: val_loss did not improve from 0.69863
+2756/2756 [==============================] - 397s 144ms/step - loss: 0.5843 - accuracy: 0.8237 - val_loss: 0.7171 - val_accuracy: 0.7881
+Epoch 55/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.5842 - accuracy: 0.8247
+Epoch 55: val_loss did not improve from 0.69863
+2756/2756 [==============================] - 407s 148ms/step - loss: 0.5842 - accuracy: 0.8247 - val_loss: 0.7405 - val_accuracy: 0.7873
+Epoch 56/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.5748 - accuracy: 0.8263
+Epoch 56: val_loss did not improve from 0.69863
+2756/2756 [==============================] - 407s 148ms/step - loss: 0.5748 - accuracy: 0.8263 - val_loss: 0.7721 - val_accuracy: 0.7801
+Epoch 57/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.5590 - accuracy: 0.8320
+Epoch 57: val_loss did not improve from 0.69863
+2756/2756 [==============================] - 403s 146ms/step - loss: 0.5590 - accuracy: 0.8320 - val_loss: 0.7044 - val_accuracy: 0.7949
+Epoch 58/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.5552 - accuracy: 0.8323
+Epoch 58: val_loss improved from 0.69863 to 0.69353, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 401s 146ms/step - loss: 0.5552 - accuracy: 0.8323 - val_loss: 0.6935 - val_accuracy: 0.7976
+Epoch 59/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.5535 - accuracy: 0.8327
+Epoch 59: val_loss improved from 0.69353 to 0.69182, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 404s 146ms/step - loss: 0.5535 - accuracy: 0.8327 - val_loss: 0.6918 - val_accuracy: 0.7981
+Epoch 60/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.5471 - accuracy: 0.8363
+Epoch 60: val_loss improved from 0.69182 to 0.68630, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 396s 144ms/step - loss: 0.5471 - accuracy: 0.8363 - val_loss: 0.6863 - val_accuracy: 0.7958
+Epoch 61/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.5398 - accuracy: 0.8378
+Epoch 61: val_loss improved from 0.68630 to 0.65016, saving model to ../weights/best_rnn_accent_mfcc_model.keras
+2756/2756 [==============================] - 401s 145ms/step - loss: 0.5398 - accuracy: 0.8378 - val_loss: 0.6502 - val_accuracy: 0.8094
+Epoch 62/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.5359 - accuracy: 0.8393
+Epoch 62: val_loss did not improve from 0.65016
+2756/2756 [==============================] - 401s 145ms/step - loss: 0.5359 - accuracy: 0.8393 - val_loss: 0.7087 - val_accuracy: 0.7968
+Epoch 63/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.5244 - accuracy: 0.8412
+Epoch 63: val_loss did not improve from 0.65016
+2756/2756 [==============================] - 404s 146ms/step - loss: 0.5244 - accuracy: 0.8412 - val_loss: 0.6852 - val_accuracy: 0.8002
+Epoch 64/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.5146 - accuracy: 0.8451
+Epoch 64: val_loss did not improve from 0.65016
+2756/2756 [==============================] - 400s 145ms/step - loss: 0.5146 - accuracy: 0.8451 - val_loss: 0.6876 - val_accuracy: 0.8010
+Epoch 65/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.5068 - accuracy: 0.8470
+Epoch 65: val_loss did not improve from 0.65016
+2756/2756 [==============================] - 404s 147ms/step - loss: 0.5068 - accuracy: 0.8470 - val_loss: 0.6751 - val_accuracy: 0.8008
+Epoch 66/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.5074 - accuracy: 0.8462
+Epoch 66: val_loss did not improve from 0.65016
+2756/2756 [==============================] - 401s 146ms/step - loss: 0.5074 - accuracy: 0.8462 - val_loss: 0.6582 - val_accuracy: 0.8085
+Epoch 67/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.4976 - accuracy: 0.8505
+Epoch 67: val_loss did not improve from 0.65016
+2756/2756 [==============================] - 405s 147ms/step - loss: 0.4976 - accuracy: 0.8505 - val_loss: 0.6909 - val_accuracy: 0.7981
+Epoch 68/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.4914 - accuracy: 0.8526
+Epoch 68: val_loss did not improve from 0.65016
+2756/2756 [==============================] - 400s 145ms/step - loss: 0.4914 - accuracy: 0.8526 - val_loss: 0.6941 - val_accuracy: 0.8012
+Epoch 69/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.4838 - accuracy: 0.8543
+Epoch 69: val_loss did not improve from 0.65016
+2756/2756 [==============================] - 397s 144ms/step - loss: 0.4838 - accuracy: 0.8543 - val_loss: 0.6725 - val_accuracy: 0.8058
+Epoch 70/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.4779 - accuracy: 0.8572
+Epoch 70: val_loss did not improve from 0.65016
+2756/2756 [==============================] - 415s 151ms/step - loss: 0.4779 - accuracy: 0.8572 - val_loss: 0.6919 - val_accuracy: 0.8038
+Epoch 71/100
+2756/2756 [==============================] - ETA: 0s - loss: 0.4685 - accuracy: 0.8601
+Epoch 71: val_loss did not improve from 0.65016
+2756/2756 [==============================] - 423s 153ms/step - loss: 0.4685 - accuracy: 0.8601 - val_loss: 0.6698 - val_accuracy: 0.8077
+Epoch 71: early stopping
+
+
+Zakonczono proces treningu modelu 1/1. Najlepsze wagi zostaly zapisane w pliku.
+552/552 [==============================] - 42s 72ms/step
+/home/ubuntu/Projekt_magisterski/tf-gpu/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+/home/ubuntu/Projekt_magisterski/tf-gpu/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+/home/ubuntu/Projekt_magisterski/tf-gpu/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+Metryki zapisane do pliku.
+
+Macierz pomylek zapisana do pliku.
