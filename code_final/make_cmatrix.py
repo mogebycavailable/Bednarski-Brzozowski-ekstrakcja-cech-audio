@@ -13,10 +13,10 @@ LABELS = {
 ### SCIEZKI FOLDEROW
 input_folder = Path("../results_and_weights/results/confusion_matrixes")
 
-output_folder = Path('../results_and_weights/results/cm_plots')
+output_folder = Path('../results_and_weights/results/cm_plots_PL')
 output_folder.mkdir(parents=True, exist_ok=True)
 
-normalized_output_folder = Path('../results_and_weights/results/cm_norm_plots')
+normalized_output_folder = Path('../results_and_weights/results/cm_norm_plots_PL')
 normalized_output_folder.mkdir(parents=True, exist_ok=True)
 
 ### GENEROWANIE MACIERZY POMYLEK Z PLIKOW NUMPY
@@ -70,15 +70,20 @@ for file in sorted(input_folder.glob("*.npy")):
     im = ax.imshow(
         cm,
         interpolation="nearest",
-        cmap="Blues"
+        cmap="viridis"
     )
 
     fig.colorbar(im, ax=ax)
 
     ax.set_title(f"Model: {file.stem.removesuffix('_cm')}")
 
-    ax.set_xlabel("Predicted")
-    ax.set_ylabel("True")
+    # ANG Labels
+    #ax.set_xlabel("Predicted")
+    #ax.set_ylabel("True")
+
+    # PL Labels
+    ax.set_xlabel("Przewidziane")
+    ax.set_ylabel("Rzeczywiste")
 
     ax.set_xticks(np.arange(len(labels)))
     ax.set_xticklabels(
@@ -132,16 +137,21 @@ for file in sorted(input_folder.glob("*.npy")):
     im = ax.imshow(
         cm_normalized,
         interpolation="nearest",
-        cmap="Blues",
+        cmap="viridis",
         vmin=0,
         vmax=1
     )
 
-    fig.colorbar(im, ax=ax, label="Proportion")
+    fig.colorbar(im, ax=ax, label="Udział procentowy [%]")
 
-    ax.set_title(f"Model: {file.stem.removesuffix('_cm')} (Row Normalized)")
-    ax.set_xlabel("Predicted")
-    ax.set_ylabel("True")
+    #ax.set_title(f"Model: {file.stem.removesuffix('_cm')} (Row Normalized)")
+    # ANG Labels
+    #ax.set_xlabel("Predicted")
+    #ax.set_ylabel("True")
+
+    # PL Labels
+    ax.set_xlabel("Przewidziane")
+    ax.set_ylabel("Rzeczywiste")
 
     ax.set_xticks(np.arange(len(labels)))
     ax.set_xticklabels(
